@@ -57,6 +57,38 @@ def enforce_pairs(score, pairs, nb, iters=500):
     return lab
 
 
+def k_colourable(edges, k, max_steps=2000000):
+    """True if the graph can be coloured with k colours (exact backtracking; small graphs)."""
+    adj = defaultdict(set)
+    for a, b in edges:
+        adj[a].add(b); adj[b].add(a)
+    order = sorted(adj, key=lambda n: -len(adj[n])); col = {}; steps = [0]
+
+    def go(i):
+        if i == len(order): return True
+        steps[0] += 1
+        if steps[0] > max_steps: return True
+        n = order[i]; used = {col[m] for m in adj[n] if m in col}
+        for c in range(k):
+            if c in used: continue
+            col[n] = c
+            if go(i + 1): return True
+            del col[n]
+            if c == len(set(col.values())): break
+        return False
+    sys.setrecursionlimit(max(10000, len(order) + 100))
+    return go(0)
+
+
+def mutual_top_pairs(bpw, k):
+    """Pairs in which each block is among the other's k-1 strongest partners."""
+    part = defaultdict(list)
+    for (i, j), w in bpw.items():
+        part[i].append((w, j)); part[j].append((w, i))
+    topk = {i: {j for w, j in sorted(v, reverse=True)[:k - 1]} for i, v in part.items()}
+    return [(i, j) for (i, j) in bpw if j in topk[i] and i in topk[j]]
+
+
 def dechimerize(blocks, G, hedges, lengths, edge_min, min_edges):
     nsplit = 0
     for _ in range(MAX_ITERS):
@@ -120,8 +152,16 @@ def label_eval(blocks, cc, lengths, top, truth, tag, nsg=2):
     D = np.array([Fz[i] - Fz[j] for i, j in pairs])
     val, vec = np.linalg.eigh(D @ D.T)
     axis = D.T @ vec[:, -1]; axis /= (np.linalg.norm(axis) + 1e-9)
+    # homoeolog pairs must be K-colourable; if not, keep mutual top-(K-1) pairs only
+    mode = os.environ.get("POLYSPLIT_MUTUAL_PAIRS", "auto")
+    colourable = k_colourable(pairs, nsg)
+    mutual = mode == "1" or (mode == "auto" and not colourable)
+    cpairs = mutual_top_pairs(bpw, nsg) if mutual else pairs
+    with open("pair_mode.txt", "w") as o:
+        o.write("mutual\n" if mutual else "all\n")
+    print(f"  pairs: {len(pairs)} block pairs, {nsg}-colourable={colourable} -> using {len(cpairs)} ({'mutual top-(K-1)' if mutual else 'all'})")
     if nsg == 2:
-        lab = enforce_pairs(Fz @ axis, pairs, nb)            # validated 2-way constrained labelling
+        lab = enforce_pairs(Fz @ axis, cpairs, nb)            # validated 2-way constrained labelling
     else:                                                    # K>2: DIVISIVE bisection in the (K-1)
         # contrast subspace. Splitting the largest cluster one bisection at a time peels the most
         # composition-distinct subgenome first (the strong leading contrast axis) and only then

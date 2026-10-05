@@ -4,6 +4,7 @@
 #          --type ont|hifi --nsg K --work OUTDIR [--flye-preset nano-raw] [--assembler flye|hifiasm] [--ref REF --chrom-subg CS]
 #          (--ref/--chrom-subg = evaluation only; --assembler hifiasm = hifiasm -l0, HiFi reads only)
 set -uo pipefail
+export PYTHONHASHSEED=0
 
 READS=""; HIC1=""; HIC2=""; TYPE=""; NSG=""; WORK=""; REF=""; CHROM_SUBG=""; FP=""; ASSEMBLER=flye
 while [ $# -gt 0 ]; do

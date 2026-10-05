@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -uo pipefail
+export PYTHONHASHSEED=0
 
 NSG=3 ; THREADS=48 ; K_PAIR=33 ; BETA=0.60
 PY=python3

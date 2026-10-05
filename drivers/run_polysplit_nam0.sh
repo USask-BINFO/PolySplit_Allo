@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -uo pipefail
+export PYTHONHASHSEED=0
 
 # ---------------- config (edit paths only if running off nugget) ----------------
 NSG=2 ; THREADS=48 ; K_PAIR=33 ; BETA=0.60

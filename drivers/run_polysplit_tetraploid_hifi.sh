@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -uo pipefail
+export PYTHONHASHSEED=0
 
 # ---------------- read-type switch (the whole "HiFi branch") ----------------
 FLYE_PRESET="--pacbio-hifi"          # ONT would be: --nano-raw

@@ -58,8 +58,19 @@ def repair(edge_min, margin=1.0):
             raw.append((a, b, w))
             if w > mx.get(a, 0): mx[a] = w
             if w > mx.get(b, 0): mx[b] = w
+    # pair_mode.txt = mutual: use only edges among the K-1 strongest of both contigs
+    nk = max(1, int(os.environ.get("POLYSPLIT_NSG", str(len(labels_present)))) - 1)
+    ws = defaultdict(list)
+    for a, b, w in raw:
+        ws[a].append(w); ws[b].append(w)
+    kth = {c: sorted(v, reverse=True)[:nk][-1] for c, v in ws.items()}
+    mode = os.environ.get("POLYSPLIT_MUTUAL_PAIRS", "auto")
+    pm = os.environ.get("POLYSPLIT_PAIR_MODE", "pair_mode.txt")
+    MUTUAL = mode == "1" or (mode == "auto" and os.path.exists(pm) and open(pm).read().strip() == "mutual")
     nbrs = defaultdict(list)
     for a, b, w in raw:
+        if MUTUAL and not (w >= kth[a] and w >= kth[b]):
+            continue
         if w >= edge_min and a in lab and b in lab and w >= FRAC * mx[a] and w >= FRAC * mx[b]:
             nbrs[a].append((b, w)); nbrs[b].append((a, w))
     nflip = 0
