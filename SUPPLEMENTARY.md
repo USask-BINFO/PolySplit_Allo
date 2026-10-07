@@ -235,6 +235,9 @@ Every input read falls into exactly one class. *Truth-labelled* reads align to t
 | *C. microcarpa* (4×) | HiFi | 1,160,267 | 903,312 (77.9%) | S1 475,283; S2 428,029 | 256,538 (22.1%) | 417 (0.04%) |
 | *C. microcarpa* T1 (6×) | ONT | 1,903,171 | 1,645,268 (86.4%) | S1 531,800; S2 503,572; S3 609,896 | 235,284 (12.4%) | 22,619 (1.2%) |
 | *C. microcarpa* T1 (6×) | HiFi | 925,873 | 771,847 (83.4%) | S1 244,805; S2 220,880; S3 306,162 | 153,600 (16.6%) | 426 (0.05%) |
+| *C. arabica* (4×) | HiFi | 11,084,430 | 10,656,890 (96.1%) | S1 (C) 5,287,263; S2 (E) 5,369,627 | 425,837 (3.8%) | 1,703 (0.02%) |
+| *P. miliaceum* (4×) | HiFi | 4,321,122 | 4,319,691 (99.97%) | S1 (A) 1,896,253; S2 (B) 2,423,438 | 0 | 1,431 (0.03%) |
+| *P. miliaceum* (4×) | ONT | 364,287 | 364,274 (99.996%) | S1 (A) 155,464; S2 (B) 208,810 | 0 | 13 (0.004%) |
 
 **Reads kept despite low mapping quality, and accuracy with and without them.** *MAPQ<20* counts truth-labelled reads whose primary alignment has MAPQ below 20; they are included in every reported accuracy. The last columns give accuracy on the truth-labelled reads with primary MAPQ ≥ 20 and < 20, and accuracy under the stricter rule 'subgenome of the primary alignment, MAPQ ≥ 20 only'.
 
@@ -252,8 +255,14 @@ Every input read falls into exactly one class. *Truth-labelled* reads align to t
 | *C. microcarpa* T1 (6×) | ONT | S1 17,004; S2 18,843; S3 9,284 | PolySplit-Ref | 90.8 | 93.7 | 49.1 | 93.7 |
 | *C. microcarpa* T1 (6×) | HiFi | S1 3,684; S2 2,432; S3 4,675 | PolySplit-Allo | 96.2 | 97.4 | 66.9 | 97.4 |
 | *C. microcarpa* T1 (6×) | HiFi | S1 3,684; S2 2,432; S3 4,675 | PolySplit-Ref | 96.9 | 98.6 | 58.7 | 98.7 |
+| *C. arabica* (4×) | HiFi | S1 (C) 104,201; S2 (E) 222,097 | PolySplit-Allo | 97.2 | 97.3 | 96.7 | 97.2 |
+| *C. arabica* (4×) | HiFi | S1 (C) 104,201; S2 (E) 222,097 | PolySplit-Ref | 96.5 | 97.2 | 79.2 | 97.2 |
+| *P. miliaceum* (4×) | HiFi | S1 (A) 16,370; S2 (B) 46,656 | PolySplit-Allo | 92.0 | 92.6 | 49.4 | 92.6 |
+| *P. miliaceum* (4×) | HiFi | S1 (A) 16,370; S2 (B) 46,656 | PolySplit-Ref | 95.6 | 96.6 | 31.1 | 96.5 |
+| *P. miliaceum* (4×) | ONT | S1 (A) 2,094; S2 (B) 3,398 | PolySplit-Allo | 95.3 | 95.7 | 71.6 | 95.6 |
+| *P. miliaceum* (4×) | ONT | S1 (A) 2,094; S2 (B) 3,398 | PolySplit-Ref | 95.4 | 96.0 | 53.7 | 96.1 |
 
-**What the reads without truth are.** Unplaced scaffolds were aligned to the *B. napus* and *C. sativa* chloroplast and mitochondrial genomes (NC_016734.1, NC_008285.1, NC_029337.1, PQ165104.1; minimap2 asm10, ≥90% identity); a scaffold is *organellar* if ≥50% of it is covered. *High-copy* scaffolds have read depth ≥3× the chromosome median. In brackets: WindowMasker-masked (repeat) fraction of the 10-kb reference window around the read's primary alignment.
+**What the reads without truth are.** Unplaced scaffolds were aligned to the *B. napus* and *C. sativa* chloroplast and mitochondrial genomes (NC_016734.1, NC_008285.1, NC_029337.1, PQ165104.1; for *C. arabica*, its own chloroplast NC_008535.1 and mitochondrial OL789880.1 and OL789881.1; minimap2 asm10, ≥90% identity); a scaffold is *organellar* if ≥50% of it is covered. *High-copy* scaffolds have read depth ≥3× the chromosome median. In brackets: WindowMasker-masked (repeat) fraction of the 10-kb reference window around the read's primary alignment. The *P. miliaceum* reference has no unplaced scaffolds.
 
 | Genome | reads | truth, MAPQ ≥ 20 | truth, MAPQ < 20 | truth via secondary alignment (primary on unplaced) | no truth: organellar | no truth: high-copy | no truth: other unplaced | unaligned |
 |---|---|---|---|---|---|---|---|---|
@@ -263,6 +272,9 @@ Every input read falls into exactly one class. *Truth-labelled* reads align to t
 | *C. microcarpa* (4×) | HiFi | 76.7% (0.25) | 0.6% (0.72) | 0.5% (0.94) | 17.7% (0.75) | 2.2% (0.52) | 2.1% (0.93) | 0.04% |
 | *C. microcarpa* T1 (6×) | ONT | 81.1% (0.29) | 2.4% (0.75) | 3.0% (0.74) | 8.6% (0.52) | 2.3% (0.96) | 1.5% (0.93) | 1.2% |
 | *C. microcarpa* T1 (6×) | HiFi | 80.0% (0.29) | 1.2% (0.65) | 2.1% (0.70) | 15.2% (0.50) | 0.3% (1.00) | 1.1% (0.89) | 0.05% |
+| *C. arabica* (4×) | HiFi | 92.6% (0.38) | 2.9% (0.80) | 0.6% (0.76) | 2.3% (0.72) | 0.8% (0.99) | 0.8% (0.95) | 0.02% |
+| *P. miliaceum* (4×) | HiFi | 98.5% (0.39) | 1.5% (0.30) | 0 | 0 | 0 | 0 | 0.03% |
+| *P. miliaceum* (4×) | ONT | 98.5% (0.40) | 1.5% (0.58) | 0 | 0 | 0 | 0 | 0.004% |
 
 ### Table S9. Read accuracy in conserved and divergent regions
 
@@ -312,6 +324,25 @@ Each anchored chromosome was cut into 10-kb windows and each window aligned to t
 | *C. microcarpa* T1 (6×) | HiFi | 97-99% | 2.3 | 2.1 | 93.8 | 89.7 | 28.8 | 35.6 |
 | *C. microcarpa* T1 (6×) | HiFi | ≥99% | 1.0 | 54.5 | 43.7 | 41.9 | 19.1 | 38.5 |
 | *C. microcarpa* T1 (6×) | HiFi | primary on unplaced scaffold | 2.6 | 0.03 | 64.5 | 52.8 | 26.4 | 31.6 |
+| *C. arabica* (4×) | HiFi | no homoeolog detected | 5.0 | 5.7 | 90.7 | 96.1 | – | 50.8 |
+| *C. arabica* (4×) | HiFi | <92% | 20.0 | 41.0 | 99.1 | 93.8 | – | 62.6 |
+| *C. arabica* (4×) | HiFi | 92-95% | 26.9 | 35.3 | 99.0 | 97.8 | – | 63.3 |
+| *C. arabica* (4×) | HiFi | 95-97% | 27.9 | 9.6 | 98.1 | 98.1 | – | 66.5 |
+| *C. arabica* (4×) | HiFi | 97-99% | 18.7 | 6.5 | 95.3 | 97.0 | – | 66.4 |
+| *C. arabica* (4×) | HiFi | ≥99% | 0.90 | 2.0 | 55.6 | 74.5 | – | 51.0 |
+| *C. arabica* (4×) | HiFi | primary on unplaced scaffold | 0.60 | 0.00 | 89.7 | 76.1 | – | 54.2 |
+| *P. miliaceum* (4×) | HiFi | no homoeolog detected | 33.2 | 13.2 | 93.5 | 97.9 | – | 68.3 |
+| *P. miliaceum* (4×) | HiFi | <92% | 14.6 | 3.7 | 94.1 | 99.9 | – | 63.4 |
+| *P. miliaceum* (4×) | HiFi | 92-95% | 29.7 | 7.6 | 94.0 | 99.7 | – | 68.4 |
+| *P. miliaceum* (4×) | HiFi | 95-97% | 14.1 | 13.3 | 94.2 | 97.9 | – | 69.1 |
+| *P. miliaceum* (4×) | HiFi | 97-99% | 5.4 | 4.0 | 92.5 | 87.2 | – | 70.8 |
+| *P. miliaceum* (4×) | HiFi | ≥99% | 3.0 | 58.2 | 32.9 | 13.9 | – | 28.3 |
+| *P. miliaceum* (4×) | ONT | no homoeolog detected | 31.7 | 39.2 | 95.0 | 98.0 | – | – |
+| *P. miliaceum* (4×) | ONT | <92% | 14.9 | 13.0 | 95.4 | 98.1 | – | – |
+| *P. miliaceum* (4×) | ONT | 92-95% | 31.2 | 4.7 | 97.0 | 98.3 | – | – |
+| *P. miliaceum* (4×) | ONT | 95-97% | 14.2 | 3.3 | 96.3 | 97.9 | – | – |
+| *P. miliaceum* (4×) | ONT | 97-99% | 5.0 | 1.5 | 94.3 | 95.6 | – | – |
+| *P. miliaceum* (4×) | ONT | ≥99% | 3.0 | 38.4 | 76.8 | 12.2 | – | – |
 
 ### Table S10. Validation of shared-33-mer homoeolog edges against the reference
 
