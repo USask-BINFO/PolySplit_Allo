@@ -419,5 +419,7 @@ inferred without a reference.
 - **Sequencing data.** *Camelina microcarpa* reads and assemblies: EBI-ENA accession PRJEB96055;
   assemblies at the public crucifer-genome repository. *B. napus* NAM0 (line N99): see the
   manuscript data-availability statement.
+  Proso millet AJ8: NCBI BioProject PRJNA1059665, reference GCA_038442765.1. *Coffea arabica* 'Kona Typica':
+  NCBI BioProject PRJNA1215012, reference GCA_049114775.1 (run accessions under Table S14).
 - **Code.** All PolySplit and baseline scripts are in this repository (`pipeline/`, `refguided/`,
   `drivers/`, `baselines/`); the tables and figures are made by the scripts in `tables/` and `figures/`; see `README.md`.
