@@ -404,7 +404,7 @@ reference from the same sample were run with the same settings, truth rule and s
 
 | Genome | reads | contigs, size, N50 | pair graph two-colourable | PolySplit-Allo contig acc. | PolySplit-Allo read acc. | PolySplit-Ref | SubPhaser, automatic groups | SubPhaser, true groups |
 |---|---|---|---|---|---|---|---|---|
-| *C. arabica* (4×) | HiFi | 1,504, 1,115 Mb, 2.5 Mb | yes | 98.7 | 97.2 | COFREF | 63.8 | 84.4 |
+| *C. arabica* (4×) | HiFi | 1,504, 1,115 Mb, 2.5 Mb | yes | 98.7 | 97.2 | 96.5 | 63.8 | 84.4 |
 | *P. miliaceum* (4×) | HiFi | 156, 836 Mb, 12.8 Mb | no | 94.3 (70.2) | 92.0 (77.8) | 95.6 | 66.7 | 96.5 |
 | *P. miliaceum* (4×) | ONT | 113, 820 Mb, 21.1 Mb | no | 98.0 (86.4) | 95.3 (84.6) | 95.4 | n/a | n/a |
 
