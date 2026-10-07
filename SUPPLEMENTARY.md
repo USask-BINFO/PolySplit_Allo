@@ -344,6 +344,8 @@ Each anchored chromosome was cut into 10-kb windows and each window aligned to t
 | *P. miliaceum* (4×) | ONT | 97-99% | 5.0 | 1.5 | 94.3 | 95.6 | – | – |
 | *P. miliaceum* (4×) | ONT | ≥99% | 3.0 | 38.4 | 76.8 | 12.2 | – | – |
 
+The ranges quoted in the manuscript are for the three main datasets. In the two added species the pattern is the same, with two differences. In *P. miliaceum*, 3.0% of reads lie in near-identical regions (≥99%), against 0.6 to 1.1% in the main datasets, and about a third of reads lie in windows with no detected homoeolog, against at most 15%; its two subgenomes differ in size (355 and 444 Mb), so more sequence has no aligned counterpart. In *C. arabica* the subgenomes are more similar: 18.7% of reads lie in regions that are 97 to 99% identical.
+
 ### Table S10. Validation of shared-33-mer homoeolog edges against the reference
 
 Each contig pair is classified with the reference: *syntenic homoeolog* (different subgenomes, and a 10-kb window of one contig has its best cross-subgenome alignment inside the other contig's reference interval), *same subgenome* (paralogs, shared repeats, duplicated haplotigs) or *unanchored* (a contig that is not a pure, anchored contig). Percentages are of pairs whose two contigs are anchored. The last block is the edge set PolySplit-Allo uses: w ≥ τ_H = 10^5 and the strongest-partner rule (an edge must be at least half as strong as the strongest edge of each of its two contigs).
