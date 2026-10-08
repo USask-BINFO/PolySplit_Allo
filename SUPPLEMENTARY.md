@@ -403,8 +403,8 @@ runs. For *Camelina*, hifiasm was also run with the ONT reads added (`--ul`), gi
 | Genome | assembler | contigs, size, N50 | PolySplit-Allo contig acc. | PolySplit-Allo read acc. | SubPhaser, automatic groups | SubPhaser, true groups |
 |---|---|---|---|---|---|---|
 | *B. napus* NAM0 (4×) | Flye | 1,217, 992 Mb, 4.8 Mb | 99.1 | 98.7 | 56.2 | 73.8 |
-| *B. napus* NAM0 (4×) | hifiasm | 641, 1,021 Mb, 15.8 Mb | 92.1 (87.4) | 90.2 (86.1) | 72.0 | 89.0 |
-| *B. napus* NAM0 (4×) | hifiasm, HiFi + ONT | 490, 1,016 Mb, 58.1 Mb | 95.2 (67.2) | 93.6 (66.8) | 62.8 | 94.7 |
+| *B. napus* NAM0 (4×) | hifiasm | 641, 1,021 Mb, 15.8 Mb | 92.1 | 90.2 | 72.0 | 89.0 |
+| *B. napus* NAM0 (4×) | hifiasm, HiFi + ONT | 490, 1,016 Mb, 58.1 Mb | 95.2 | 93.6 | 62.8 | 94.7 |
 | *C. microcarpa* (4×) | Flye | 198, 361 Mb, 10.5 Mb | 100.0 | 99.0 | 64.5 | 92.9 |
 | *C. microcarpa* (4×) | hifiasm | 1,012, 409 Mb, 14.8 Mb | 97.9 | 98.2 | 84.0 | 93.3 |
 | *C. microcarpa* (4×) | hifiasm, HiFi + ONT | 337, 384 Mb, 16.2 Mb | 99.9 | 99.2 | 49.4 | 93.6 |
@@ -417,11 +417,9 @@ On the *Camelina* assemblies PolySplit-Allo gives the same accuracy with either 
 On *B. napus* the hifiasm contigs approach chromosome length. Paralogous chromosomes from the ancient *Brassica*
 triplication then share more 33-mers than τ_H (for example N14 with N11 and N17, all in the C subgenome), so some
 block pairs join blocks of the same subgenome. The pair graph is then not two-colourable (2 and 21 triangles in
-the two assemblies), and PolySplit-Allo keeps only mutual-best pairs (Methods). Values in parentheses are without
-this check, with all pairs kept: the pair constraint and the repair step then move large contigs to the wrong
-subgenome. In all Flye and *Camelina* rows the pair graph is K-colourable, all pairs are kept, and the results are
-the same with or without the check. With the check, PolySplit-Allo is above scaffold-first with true groups on the
-HiFi assembly (90.2% against 89.0%) and slightly below it on the HiFi + ONT assembly (93.6% against 94.7%).
+the two assemblies), and PolySplit-Allo keeps only mutual-best pairs (Methods). In all Flye and *Camelina* rows
+the pair graph is K-colourable and all pairs are kept. PolySplit-Allo is above scaffold-first with true groups on
+the HiFi assembly (90.2% against 89.0%) and slightly below it on the HiFi + ONT assembly (93.6% against 94.7%).
 
 ### Table S14. Species outside Brassicaceae
 
@@ -438,13 +436,13 @@ reference from the same sample were run with the same settings, truth rule and s
 | Genome | reads | contigs, size, N50 | pair graph two-colourable | PolySplit-Allo contig acc. | PolySplit-Allo read acc. | PolySplit-Ref | SubPhaser, automatic groups | SubPhaser, true groups |
 |---|---|---|---|---|---|---|---|---|
 | *C. arabica* (4×) | HiFi | 1,504, 1,115 Mb, 2.5 Mb | yes | 98.7 | 97.2 | 96.5 | 63.8 | 84.4 |
-| *P. miliaceum* (4×) | HiFi | 156, 836 Mb, 12.8 Mb | no | 94.3 (70.2) | 92.0 (77.8) | 95.6 | 66.7 | 96.5 |
-| *P. miliaceum* (4×) | ONT | 113, 820 Mb, 21.1 Mb | no | 98.0 (86.4) | 95.3 (84.6) | 95.4 | n/a | n/a |
+| *P. miliaceum* (4×) | HiFi | 156, 836 Mb, 12.8 Mb | no | 94.3 | 92.0 | 95.6 | 66.7 | 96.5 |
+| *P. miliaceum* (4×) | ONT | 113, 820 Mb, 21.1 Mb | no | 98.0 | 95.3 | 95.4 | n/a | n/a |
 
-Cells give read accuracy (%) unless stated; values in parentheses are without the colourability check. In coffee,
+Cells give read accuracy (%) unless stated. In coffee,
 whose assembly is fragmented, all pairs are consistent and PolySplit-Allo is well above scaffold-first. In proso
 millet the Flye contigs are close to chromosome length, and B-subgenome chromosomes share enough 33-mers with each
-other to exceed τ_H (58 and 63 triangles in the pair graph); the check removes these pairs. On the millet HiFi
+other to exceed τ_H (58 and 63 triangles in the pair graph); the colourability check removes these pairs. On the millet HiFi
 assembly scaffold-first reaches 96.5% when it is given the true homoeologous groups and 66.7% when the groups are
 inferred without a reference.
 
