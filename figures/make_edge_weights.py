@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-"""Fig S4: shared 33-mers per contig pair (w_kmer), split by what the reference says the pair is
-(from pipeline/validate_edges.py). Pairs below 100 shared 33-mers are not classified.
-usage: make_edge_weights.py datasets.tsv OUTDIR out.png"""
 import sys, os, json
 import numpy as np
 import matplotlib

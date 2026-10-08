@@ -1,17 +1,4 @@
 #!/usr/bin/env python3
-"""Read accounting and read-level scoring (Supplementary Tables S8, S9 and Figs S5, S6).
-
-For every dataset in datasets.tsv (see tables/datasets.template.tsv) every input read is put in one class
-(truth-labelled, aligned only to unplaced scaffolds, unaligned) and each method's read labels are scored.
-Truth = the subgenome whose anchored chromosomes receive the most matched bases over all alignments of
-the read in <run_dir>/reads_to_ref.paf. Outcomes are a subgenome, ambiguous (evidence but no decision)
-or unassigned (no evidence); groups are matched to subgenomes by the best one-to-one assignment.
-Accuracy is also split by primary MAPQ (>=20 / <20) and by the homoeolog identity of the reference
-window under the read, when <outdir>/reference/<ref_id>/windows/windows.tsv exists.
-
-usage: read_accounting.py datasets.tsv OUTDIR [--only KEY] [--label KEY NAME FILE ...]
-KEY = <ref_id>_<ont|hifi>. Writes OUTDIR/reads/KEY.json; parsed PAFs are cached in OUTDIR/reads/cache/.
-"""
 import sys, os, pickle, subprocess, json, argparse
 from collections import defaultdict, Counter
 from itertools import permutations
@@ -42,7 +29,6 @@ def load_map(path):
 
 
 def parse_paf(paf, cmap, cache):
-    """read -> (truth, primary target, primary midpoint, primary MAPQ, read length)"""
     if os.path.exists(cache):
         return pickle.load(open(cache, "rb"))
     sums = defaultdict(lambda: defaultdict(int)); prim = {}; mapped = set()
@@ -74,8 +60,6 @@ def parse_paf(paf, cmap, cache):
 
 
 def load_labels(path):
-    """read -> subgenome label, 'ambiguous' or 'unassigned'. Files with *_hits columns (PolySplit-Ref):
-    a no-call with zero hits is unassigned. Reads absent from a file are unassigned."""
     lab = {}
     with open(path) as f:
         hdr = f.readline().rstrip("\n").split("\t")

@@ -33,7 +33,6 @@ for score, a, b in cand:
         continue
     pairs.append((a, b)); used.add(a); used.add(b)
 
-# pair any leftover big scaffolds with each other so all are included (even-count rows only)
 unmatched = [s for s in big if s not in used]
 for i in range(0, len(unmatched) - 1, 2):
     pairs.append((unmatched[i], unmatched[i + 1])); used.update(unmatched[i:i+2])

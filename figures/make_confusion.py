@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""Figs S5 and S6: read-level confusion matrices from pipeline/read_accounting.py output, so every cell
-matches Table II and Table S8. Columns: subgenomes, ambiguous (evidence, no decision), unassigned (no evidence).
-usage: make_confusion.py datasets.tsv OUTDIR figures_dir
-       -> FigS4_confusion_all.png (HiFi, four methods) and FigS5_confusion_chem.png (PolySplit-Ref vs PolySplit-Allo)"""
 import sys, os, json
 import numpy as np
 import matplotlib

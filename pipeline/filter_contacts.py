@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-"""Keep contig pairs with at least MIN_COUNT Hi-C contacts.
-usage: filter_contacts.py contacts.pkl out.pkl MIN_COUNT"""
 import sys, pickle
 
 contacts, lengths = pickle.load(open(sys.argv[1], "rb"))

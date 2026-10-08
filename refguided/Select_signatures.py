@@ -60,7 +60,6 @@ def main():
     max_doc = int(gsa["doc"].max())
     doc_group = np.full(max_doc + 1, -1, dtype=np.int8)
 
-    # Map doc_id -> contig name using FASTA order (0-based). Leave extras as -1.
     for doc_id, name in enumerate(names_ac):
         if doc_id > max_doc:
             break
@@ -69,24 +68,20 @@ def main():
         elif name in names_C:
             doc_group[doc_id] = 1
 
-    # Reservoirs store tuples: (contig, start0, end0, copy)
     A_res, C_res = [], []
     seenA = 0
     seenC = 0
 
-    # Current block state
     cntA = 0
     cntC = 0
-    repA = None  # (contig, pos0)
-    repC = None  # (contig, pos0)
+    repA = None
+    repC = None
 
     def flush_block():
         nonlocal seenA, seenC, cntA, cntC, repA, repC
-        # A-only
         if cntA > 0 and cntC == 0 and cntA <= args.max_copy and repA is not None:
             contig, pos0 = repA
             seenA = reservoir_add(A_res, seenA, (contig, pos0, pos0 + K, cntA), args.target, rng)
-        # C-only
         if cntC > 0 and cntA == 0 and cntC <= args.max_copy and repC is not None:
             contig, pos0 = repC
             seenC = reservoir_add(C_res, seenC, (contig, pos0, pos0 + K, cntC), args.target, rng)
@@ -105,7 +100,6 @@ def main():
         if grp < 0:
             continue
 
-        # doc -> contig name
         if doc < len(names_ac):
             contig = names_ac[doc]
         else:
@@ -116,7 +110,6 @@ def main():
         if clen is None:
             continue
 
-        # only consider positions where we can take a full k-mer
         if pos0 > clen - K:
             continue
 
@@ -131,7 +124,6 @@ def main():
 
     flush_block()
 
-    # Write BED
     A_bed = args.out_prefix + ".A.bed"
     C_bed = args.out_prefix + ".C.bed"
 
@@ -150,4 +142,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

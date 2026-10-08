@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-# Table S11 sensitivity: minimum Hi-C contacts per contig pair (2, 5, 10) and tau_H (5e4, 2e5).
-# Re-runs Hi-C blocks -> labelling -> repair -> propagation on an existing run, one setting at a time.
-# usage: sensitivity_blocks.sh <run_dir> <assembly.fasta> <K> <outdir>
 set -uo pipefail
 RD=$1; ASM=$2; NSG=$3; OUT=$4
 PY=python3; PIPE=$POLYSPLIT/pipeline

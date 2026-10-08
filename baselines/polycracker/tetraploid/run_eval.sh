@@ -2,7 +2,6 @@
 set -uo pipefail
 BASE=$DATA/camelina/Tetraploid_data/polycracker_baseline
 PY=python3
-# auto-discover the clusterResults dir (the SpectralClustering..._n3 name can vary)
 CLUSTER="$(find "$BASE/pc_work" -type d -name clusterResults 2>/dev/null | head -1)"
 
 if [ -z "$CLUSTER" ] || [ -z "$(ls "$CLUSTER"/subgenome_*.txt 2>/dev/null)" ]; then

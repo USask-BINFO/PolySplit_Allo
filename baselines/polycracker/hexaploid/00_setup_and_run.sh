@@ -7,12 +7,10 @@ GENOME=CmiT1_hifi.fa
 WORK="$BASE/pc_work"
 mkdir -p "$WORK"
 
-# stage the SAME assembly PolySplit used (real file -- udocker mounts $WORK, no symlinks)
 [ -s "$WORK/$GENOME" ] || cp "$ASM" "$WORK/$GENOME"
 echo "staged $GENOME ($(du -h "$WORK/$GENOME" | cut -f1)) in $WORK"
-md5sum "$ASM" "$WORK/$GENOME"     # confirm identical to PolySplit's HiFi input
+md5sum "$ASM" "$WORK/$GENOME"
 
-# run polyCRACKER: genome, n_subgenomes=3 (hexaploid), chunk=100kb (same config as napus/tetraploid)
 WORK="$WORK" bash "$DRIVER" "$GENOME" 3 100000
 
 echo "DONE -> $WORK/analysisOutputs_${GENOME%.fa}_n3/"

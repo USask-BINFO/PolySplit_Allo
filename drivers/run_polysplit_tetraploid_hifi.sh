@@ -2,25 +2,22 @@
 set -uo pipefail
 export PYTHONHASHSEED=0
 
-# ---------------- read-type switch (the whole "HiFi branch") ----------------
-FLYE_PRESET="--pacbio-hifi"          # ONT would be: --nano-raw
-MMX="map-hifi"                       # ONT would be: map-ont
+FLYE_PRESET="--pacbio-hifi"
+MMX="map-hifi"
 
-# ---------------- config ----------------
 NSG=2 ; THREADS=48 ; K_PAIR=33 ; BETA=0.60
 PY=python3
 PKG=$POLYSPLIT
 PIPE=$PKG/pipeline
 DATA=$DATA/camelina/Tetraploid_data
 LONG_READS=$DATA/CN119243.hifi.fastq.gz
-HIC_R1=$DATA/CN119243.hic.R1.fastq.gz     # Hi-C is chemistry-independent: same as ONT run
+HIC_R1=$DATA/CN119243.hic.R1.fastq.gz
 HIC_R2=$DATA/CN119243.hic.R2.fastq.gz
-REF=$DATA/Cmicrocarpa.CN119243.fa.gz       # same eval reference as ONT run
-CHROM_SUBG=$PKG/chrom_subg.tetraploid.tsv  # same truth: Chr01-06->S1, Chr07-13->S2
+REF=$DATA/Cmicrocarpa.CN119243.fa.gz
+CHROM_SUBG=$PKG/chrom_subg.tetraploid.tsv
 WORK=$DATA/polysplit_run_hifi ; mkdir -p "$WORK"
 ASM=$WORK/flye_out/assembly.fasta
 
-# tools (nugget-validated)
 FLYE_BIN=${FLYE_BIN:-/path/to/flye/bin}
 BWA=bwa
 SAMTOOLS=samtools
@@ -30,7 +27,6 @@ GSUFSORT=gsufsort
 
 log(){ echo "### $* | $(date) ###"; }
 
-# read count (for the T3 eval denominator); cached so re-runs don't re-scan
 if [ -s "$WORK/total_reads.txt" ]; then TOTAL_READS=$(cat "$WORK/total_reads.txt"); else
   log "counting HiFi reads"
   TOTAL_READS=$("$SEQKIT" stats -T -j 8 "$LONG_READS" | awk 'NR==2{print $4}')
@@ -38,7 +34,6 @@ if [ -s "$WORK/total_reads.txt" ]; then TOTAL_READS=$(cat "$WORK/total_reads.txt
 fi
 log "HiFi reads = $TOTAL_READS  | preset $FLYE_PRESET / $MMX"
 
-# ---------------- Stage 1: Flye (HiFi) ----------------
 if [ ! -s "$ASM" ]; then
   export PATH="$FLYE_BIN:$PATH"
   if [ -d "$WORK/flye_out/00-assembly" ]; then
@@ -53,7 +48,6 @@ fi
 [ -s "$ASM.fai" ] || "$SAMTOOLS" faidx "$ASM"
 log "contigs: $(grep -c '^>' "$ASM")"
 
-# ---------------- Stage 2: Hi-C -> contig contact graph ----------------
 if [ ! -s "$WORK/contacts.pkl" ]; then
   log "Stage 2: Hi-C contacts"
   [ -s "$ASM.bwt" ] || "$BWA" index "$ASM"
@@ -76,7 +70,6 @@ PY
   "$SAMTOOLS" view "$WORK/hic.nsort.bam" | "$PY" "$WORK/build_contacts.py" "$ASM.fai" "$WORK/contacts.pkl"
 fi
 
-# ---------------- Stage 3: shared-33mer homoeolog edges ----------------
 if [ ! -s "$WORK/homoeolog_edges.tsv" ]; then
   log "Stage 3: gsufsort GSA + LCP (two runs) + homoeolog edges"
   "$GSUFSORT" "$ASM" --fasta --gsa 4 8 --output "$WORK/contigs_k33"
@@ -86,7 +79,6 @@ if [ ! -s "$WORK/homoeolog_edges.tsv" ]; then
         --min-copy 2 --max-copy 6 --out "$WORK/homoeolog_edges.tsv"
 fi
 
-# ---------------- Stage 4-6: blocks -> de-chimerize -> label -> recover -> repair ----------------
 if [ ! -s "$WORK/all_contig_labels_repaired.tsv" ]; then
   log "Stage 4-6: blocks/label/repair"
   export POLYSPLIT_NSG="$NSG" POLYSPLIT_FASTA="$ASM" \
@@ -101,19 +93,16 @@ if [ ! -s "$WORK/all_contig_labels_repaired.tsv" ]; then
   cut -f2 "$WORK/all_contig_labels_repaired.tsv" | tail -n +2 | sort | uniq -c
 fi
 
-# ---------------- Stage 7: reads -> contigs + reads -> ref (HiFi preset) ----------------
 [ -s "$WORK/reads_to_contigs.paf" ] || { log "Stage 7a: reads->contigs ($MMX)"; \
   "$MINIMAP2" -x "$MMX" -t "$THREADS" "$ASM" "$LONG_READS" > "$WORK/reads_to_contigs.paf"; }
 [ -s "$WORK/reads_to_ref.paf" ] || { log "Stage 7b: reads->ref ($MMX, truth)"; \
   "$MINIMAP2" -cx "$MMX" -t "$THREADS" "$REF" "$LONG_READS" > "$WORK/reads_to_ref.paf"; }
 
-# ---------------- Stage 8: propagate contig labels -> reads ----------------
 [ -s "$WORK/read_subg.tsv" ] || { log "Stage 8: propagate"; \
   "$PY" "$PIPE/propagate_to_reads.py" --paf "$WORK/reads_to_contigs.paf" \
         --contig-labels "$WORK/all_contig_labels_repaired.tsv" --min-conf "$BETA" --weight ident \
         --out "$WORK/read_subg.tsv"; }
 
-# ---------------- Stage 9: evaluation (contig + read) ----------------
 log "Stage 9a: per-contig truth + CONTIG accuracy"
 [ -s "$WORK/contigs_to_ref.paf" ] || \
   "$MINIMAP2" -cx asm10 -t "$THREADS" "$REF" "$ASM" > "$WORK/contigs_to_ref.paf"

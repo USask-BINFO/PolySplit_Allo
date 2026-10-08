@@ -10,7 +10,6 @@ def parse_header(h):
     m = re.match(r"^(.*)_(\d+)_(\d+)$", h)
     if m:
         return m.group(1), int(m.group(2)), int(m.group(3))
-    # fallback: scaffold:start-end
     m = re.match(r"^(.*):(\d+)-(\d+)$", h)
     if m:
         return m.group(1), int(m.group(2)), int(m.group(3))
@@ -60,7 +59,6 @@ def chunk_truth_trip(contig, s, e, truth):
 def best_perm_accuracy(pairs, classes):
     preds = sorted({p for p, _ in pairs})
     best = 0.0; bestmap = None
-    # try all assignments of cluster->class (clusters may be <= len(classes))
     for perm in permutations(classes, len(preds)):
         mp = dict(zip(preds, perm))
         acc = sum(mp[p] == t for p, t in pairs) / len(pairs)
@@ -101,7 +99,6 @@ def main():
 
     acc, mp = best_perm_accuracy(pairs, classes)
     base = Counter(t for _, t in pairs).most_common(1)[0][1] / len(pairs)
-    # bin composition
     comp = defaultdict(Counter)
     for ci, t in pairs:
         comp[ci][t] += 1

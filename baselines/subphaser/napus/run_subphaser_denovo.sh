@@ -2,7 +2,7 @@
 set -euo pipefail
 SP=$SUBPHASER
 CONDA=$CONDA_PREFIX/etc/profile.d/conda.sh
-ENV=subphaser_core    # MINIMAL core env (the full SubPhaser.yaml has stale, unsolvable pins)
+ENV=subphaser_core
 HERE=$(cd "$(dirname "$0")" && pwd)
 SCAF=$DATA/Napus_nam_denovo/sa_read_correct/hic_ac_cluster/yahs/napus_scaffolds_final.fa
 CFG="$HERE/denovo_pairs_sg.config"
@@ -16,8 +16,6 @@ if ! conda env list | grep -qiE "(^|/)$ENV([ /]|$)"; then
 fi
 conda activate "$ENV"
 command -v subphaser >/dev/null 2>&1 || { echo "[install] pip install $SP"; pip install -e "$SP"; }
-# NOTE: -just_core writes *.chrom-subgenome.tsv BEFORE the (R) heatmap step, so even if the heatmap
-# errors for lack of R in this minimal env, the per-scaffold assignment we need is already on disk.
 
 cd "$HERE"
 DT=$(date +"%y%m%d%H%M")

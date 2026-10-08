@@ -1,13 +1,4 @@
 #!/usr/bin/env python3
-"""What the reads without a truth label are, and how repetitive the scored reads are (Table S8).
-
-Every mapped read goes into one class by its primary alignment: truth MAPQ>=20, truth MAPQ<20, truth via a
-secondary alignment (primary on an unplaced scaffold), or no truth on an organellar scaffold (>=50% covered
-by organelle hits at >=90% identity), a high-copy scaffold (read depth >=3x the chromosome median) or another
-unplaced scaffold. Repeat = WindowMasker-masked fraction of the 10-kb window around the primary alignment.
-Needs the read_accounting.py cache and drivers/run_reference_annotation.sh output.
-usage: unlabelled_reads.py datasets.tsv OUTDIR [--only KEY]   -> OUTDIR/unlabelled/KEY.json
-"""
 import sys, os, json, pickle, bisect, argparse
 from collections import defaultdict, Counter
 import numpy as np

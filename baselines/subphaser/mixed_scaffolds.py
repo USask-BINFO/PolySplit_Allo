@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""Scaffolds that join sequence from different subgenomes (Table S12).
-For each scaffold >= 10 Mb: bp from each subgenome (pure, anchored contigs of wg_purity.per_contig.tsv) and
-the minority-subgenome fraction; a scaffold is mixed if that fraction is >= 5%.
-usage: mixed_scaffolds.py scaffolds_final.agp wg_purity.per_contig.tsv > mixed.json"""
 import sys, json
 from collections import defaultdict
 

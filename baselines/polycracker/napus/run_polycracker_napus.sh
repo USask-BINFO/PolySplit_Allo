@@ -3,13 +3,12 @@ set -euo pipefail
 
 GENOME=${1:?usage: run_polycracker_napus.sh <genome.fa> <n_subgenomes> [chunk_bp]}
 NSUBG=${2:?need n_subgenomes (2 for A/C, 3 for triplication)}
-CHUNK=${3:-100000}                       # chunk size (bp); 50k-250k works for plant chromosomes
+CHUNK=${3:-100000}
 IMG=sgordon/polycracker-miniconda:1.0.3
-WORK=${WORK:-$(pwd)/pc_work}             # mount dir; the genome fasta must be in here
+WORK=${WORK:-$(pwd)/pc_work}
 mkdir -p "$WORK"
 [ -s "$WORK/$GENOME" ] || { echo "ERROR: put $GENOME in $WORK first"; exit 1; }
 
-# ---- write config (full default set, with our genome/n_subgenomes/chunk) ----
 cat > "$WORK/config_polyCRACKER.txt" <<EOF
 blastPath = ./blast_files/
 kmercountPath = ./kmercount_files/
@@ -65,17 +64,11 @@ EOF
 OUTDIR="analysisOutputs_${GENOME%.fa}_n${NSUBG}"
 echo "[polycracker] $GENOME  n_subgenomes=$NSUBG  chunk=$CHUNK  -> $WORK/$OUTDIR"
 udocker pull "$IMG"
-# NOTE: a 0.4-0.9 Gb plant genome needs lots of RAM/time; raise blastMemory/threads above and
-# give Docker enough memory. Heavy repeat content -> long blast/kmer steps.
 RUNDIR="pcrun_${GENOME%.fa}_n${NSUBG}"
 udocker run --rm -w / -v "$WORK":/work "$IMG" bash -lc "
   set -e ; export PATH=/opt/conda/bin:\$PATH
   export _JAVA_OPTIONS='-Xms3G -Xmx${MEM:-40}G'
-  # keep bedtools/pybedtools scratch OFF the quota-limited /tmp -> on the big /work mount
   export TMPDIR=/work/$RUNDIR/tmp
-  # stage a working copy on the bind-mounted /work (big filesystem) so all
-  # intermediates + outputs persist and never fill the container layer.
-  # (re)stage only when missing or FRESH=1; otherwise -resume the cached run.
   if [ ! -d /work/$RUNDIR ] || [ -n \"${FRESH:-}\" ]; then
     rm -rf /work/$RUNDIR ; cp -R /workdir/polycracker /work/$RUNDIR ;
   fi

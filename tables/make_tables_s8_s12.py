@@ -1,9 +1,4 @@
 #!/usr/bin/env python3
-"""Generate Supplementary Tables S8-S12 (Markdown) from the evaluation outputs in OUTDIR:
-reads/ (pipeline/read_accounting.py), unlabelled/ (pipeline/unlabelled_reads.py), edges/ (pipeline/validate_edges.py),
-sensitivity/summary.json (pipeline/score_sensitivity.py) and scaffold_first/<KEY>/{mixed,groups}.json
-(baselines/subphaser/mixed_scaffolds.py, check_groups.py).
-usage: make_tables_s8_s12.py datasets.tsv OUTDIR > tables_s8_s12.md"""
 import sys, os, json
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "pipeline"))
 from read_accounting import read_config

@@ -1,20 +1,4 @@
 #!/usr/bin/env python3
-"""Generate Supplementary Table S7 (contig misplacement, per dataset and read chemistry).
-
-For each dataset x chemistry it reads three files produced by the PolySplit-Allo run:
-  <run_dir>/contigs_to_ref.paf             contigs aligned to the chromosome-anchored reference
-  <run_dir>/all_contig_labels_repaired.tsv PolySplit final contig -> subgenome labels
-  <chrom_map>                              reference chromosome -> subgenome (TSV: chrom<TAB>subg)
-
-Each contig's TRUE subgenome is its majority under positional best-identity assignment (per query
-base, the subgenome of the highest-identity alignment covering it). A contig is MISPLACED when the
-subgenome PolySplit assigned it (cluster mapped to truth by best one-to-one) differs from that
-majority. Contigs with no anchored alignment are excluded. Prints the Table S7 markdown.
-
-Usage:  make_table_s7.py datasets.tsv
-        datasets.tsv columns (tab-separated, one row per dataset x chemistry, header line ignored):
-        name<TAB>reads<TAB>run_dir<TAB>chrom_map
-"""
 import sys, collections, numpy as np
 
 def load_map(fn):

@@ -1,10 +1,4 @@
 #!/usr/bin/env python3
-"""Score the drivers/sensitivity_blocks.sh runs (Table S11): contig-bp accuracy of labelled pure contigs,
-number of blocks, de-chimerization splits and repair flips, read accuracy (same truth as read_accounting.py),
-and agreement of the contig labels with the default run.
-usage: score_sensitivity.py datasets.tsv OUTDIR    (runs in OUTDIR/sensitivity/KEY/<setting>/)
-                                                   -> OUTDIR/sensitivity/summary.json
-"""
 import os, re, sys, glob, json, pickle
 from collections import Counter
 from itertools import permutations
@@ -26,7 +20,6 @@ def contig_labels(path):
 
 
 def matched(a, b, weight=None):
-    """best one-to-one agreement between two labelings (weighted by contig length if given)"""
     common = [c for c in a if c in b]
     la, lb = sorted(set(a.values())), sorted(set(b.values()))
     best = 0.0

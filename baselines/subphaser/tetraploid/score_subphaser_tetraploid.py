@@ -9,7 +9,6 @@ OUTLAB = sys.argv[3] if len(sys.argv) > 3 else "subphaser_contig_labels.tsv"
 TRUTH  = sys.argv[4] if len(sys.argv) > 4 else \
     "$DATA/camelina/Tetraploid_data/polysplit_run/wg_purity.per_contig.tsv"
 
-# truth: contig -> S1/S2 (pure only)
 ctruth = {}
 for ln in open(TRUTH):
     if ln.startswith("contig\t"):
@@ -18,7 +17,6 @@ for ln in open(TRUTH):
     if kls.startswith("pure_"):
         ctruth[c] = kls.split("_", 1)[1]
 
-# AGP: scaffold -> [(contig, bp)]
 scaf_contigs = defaultdict(list)
 for ln in open(AGP):
     p = ln.rstrip("\n").split("\t")
@@ -30,7 +28,6 @@ def norm(chrom):
     m = re.search(r"scaffold_\d+", chrom)
     return m.group(0) if m else chrom
 
-# SubPhaser scaffold -> SG
 scaf_sg = {}
 for ln in open(SGOUT):
     if ln.startswith("#") or not ln.strip():
@@ -40,7 +37,6 @@ for ln in open(SGOUT):
         continue
     scaf_sg[norm(p[0])] = p[1]
 
-# oracle: best 1:1 SG-cluster -> subgenome
 sg_ac = defaultdict(lambda: defaultdict(int))
 for s, sg in scaf_sg.items():
     for contig, bp in scaf_contigs.get(s, []):

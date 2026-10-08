@@ -73,10 +73,10 @@ def main():
                 doc_group[doc_id] = g
                 break
 
-    res = [[], [], []]                 # signature reservoirs per subgenome
+    res = [[], [], []]
     seen = [0, 0, 0]
-    cnt = [0, 0, 0]                     # copies of current block per subgenome
-    rep = [None, None, None]           # representative (contig, pos0) per subgenome
+    cnt = [0, 0, 0]
+    rep = [None, None, None]
 
     def flush_block():
         for g in range(3):

@@ -9,15 +9,14 @@ GSUFSORT=gsufsort-64
 DATA=$DATA/camelina/Hexaploid_data
 WORK=$DATA/polysplit_run
 RGW=$WORK/refguided
-CHROM_SUBG=$HERE/chrom_subg.hexaploid.tsv          # Chr01-06->S1, Chr07-13->S2, Chr14-20->S3
-REF=$DATA/Cmicrocarpa.CN119205.fa.gz               # eval reference = truth
+CHROM_SUBG=$HERE/chrom_subg.hexaploid.tsv
+REF=$DATA/Cmicrocarpa.CN119205.fa.gz
 READS=$DATA/TMP24026.ONT.fastq.gz
-TOTAL=1903171                                       # cached total ONT reads ($WORK/total_reads.txt)
+TOTAL=1903171
 K=33
 mkdir -p "$RGW"
 log(){ echo "### $* | $(date) ###"; }
 
-# ---- Stage 0: per-subgenome chromosome FASTAs (chrom.fa = doc order for the index) ----
 if [ ! -s "$RGW/chrom.fa.fai" ]; then
   log "build chrom.fa + S1/S2/S3.fa from reference (chromosomes with subgenome truth only)"
   awk '$2=="S1"{print $1}' "$CHROM_SUBG" > "$RGW/s1.ids"
@@ -32,7 +31,6 @@ if [ ! -s "$RGW/chrom.fa.fai" ]; then
   echo "chrom.fa seqs: $(grep -c '^>' "$RGW/chrom.fa")  (S1 $(grep -c '^>' "$RGW/S1.fa") / S2 $(grep -c '^>' "$RGW/S2.fa") / S3 $(grep -c '^>' "$RGW/S3.fa"))"
 fi
 
-# ---- Stage 1: gsufsort GSA + LCP (k=33) ----
 GSA="$RGW/chrom_k33.4.8.gsa"; LCP="$RGW/chrom_k33.1.lcp"
 if [ ! -s "$GSA" ] || [ ! -s "$LCP" ]; then
   log "gsufsort-64 index (GSA 4,8 + 1-byte trLCP 33)"
@@ -41,7 +39,6 @@ if [ ! -s "$GSA" ] || [ ! -s "$LCP" ]; then
   [ -s "$GSA" ] && [ -s "$LCP" ] || { echo "!! gsufsort did not produce GSA/LCP -- abort (run on NUGGET)"; exit 2; }
 fi
 
-# ---- Stage 2: select subgenome-specific k=33 signatures (K=3) ----
 if [ ! -s "$RGW/sig_k33.S1.bed" ]; then
   log "Select_signatures_k3 (max-copy 3, keep all)"
   "$PY" "$A/Select_signatures_k3.py" --k "$K" --gsa "$GSA" --lcp "$LCP" \
@@ -51,7 +48,6 @@ fi
 wc -l "$RGW/sig_k33.S1.bed" "$RGW/sig_k33.S2.bed" "$RGW/sig_k33.S3.bed"
 for g in S1 S2 S3; do [ -s "$RGW/sig_k33.$g.bed" ] || { echo "!! $g BED empty -- abort"; exit 3; }; done
 
-# ---- Stage 3: signature sequences -> clean (drop k-mers shared across subgenomes) ----
 if [ ! -s "$RGW/S1_sig_k33.txt" ]; then
   log "extract signature sequences (seqkit subseq --bed) + clean"
   for g in S1 S2 S3; do
@@ -65,7 +61,6 @@ n1=$(wc -l < "$RGW/S1_sig_k33.txt"); n2=$(wc -l < "$RGW/S2_sig_k33.txt"); n3=$(w
 echo "clean sig 33-mers: S1=$n1 S2=$n2 S3=$n3"
 { [ "$n1" -gt 1000 ] && [ "$n2" -gt 1000 ] && [ "$n3" -gt 1000 ]; } || { echo "!! a sig set too small -- abort (S1/S2 may be too similar for ref-specific kmers)"; exit 4; }
 
-# ---- Stage 4: classify reads by signature hits (k=33, min-hits 3, ratio 3.0) ----
 if [ ! -s "$RGW/read_labels_refguided.tsv" ]; then
   log "classify reads (K=3)"
   "$PY" "$A/classify_reads_k3.py" "$RGW/S1_sig_k33.txt" "$RGW/S2_sig_k33.txt" "$RGW/S3_sig_k33.txt" \
@@ -73,7 +68,6 @@ if [ ! -s "$RGW/read_labels_refguided.tsv" ]; then
 fi
 cut -f2 "$RGW/read_labels_refguided.tsv" | tail -n +2 | sort | uniq -c
 
-# ---- Stage 5: evaluate vs S1/S2/S3 truth (Acc/Prec/Rec/F1) ----
 log "EVALUATE reference-guided vs S1/S2/S3 truth"
 cut -f1,5 "$RGW/read_labels_refguided.tsv" > "$RGW/read_labels_refguided.2col.tsv"
 "$PY" "$HERE/pipeline/allread_eval.py" --labels "$RGW/read_labels_refguided.2col.tsv" \

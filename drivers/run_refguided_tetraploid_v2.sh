@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -uo pipefail
 HERE=$POLYSPLIT
-A=$DATA          # napus ref-guided scripts
+A=$DATA
 SK=seqkit
 PY=python3
 RGW=$DATA/camelina/Tetraploid_data/polysplit_run/refguided

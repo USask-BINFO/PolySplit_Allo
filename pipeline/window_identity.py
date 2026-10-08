@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-"""Homoeolog identity of each reference window: union of aligned bases (coverage) and alignment-length-
-weighted identity (1 - de) over all alignments of the window to the other subgenome(s).
-usage: window_identity.py windows_dir    (reads win.*.fa and cross.*.paf, writes windows.tsv)"""
 import sys, glob
 from collections import defaultdict
 

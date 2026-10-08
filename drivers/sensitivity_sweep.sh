@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# Table S4 sensitivity: t, rho (PolySplit-Ref classifier) and beta, alpha (PolySplit).
-# usage: sensitivity_sweep.sh <workdir> <chrom_subg.tsv>
 set -uo pipefail
 W=$1; CHROM=$2
 PIPE=$POLYSPLIT/pipeline; RG=$POLYSPLIT/refguided; PY=python3

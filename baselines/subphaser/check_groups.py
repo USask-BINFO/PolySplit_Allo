@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""Check a SubPhaser homoeolog-group config against the reference (Table S12): the majority subgenome and
-chromosome of each scaffold, and whether each group holds one scaffold per subgenome.
-usage: check_groups.py groups.config scaffolds_final.agp wg_purity.per_contig.tsv contigs_to_ref.paf \
-                       [chrom-subgenome.tsv] > groups.json"""
 import sys, json
 from collections import defaultdict, Counter
 

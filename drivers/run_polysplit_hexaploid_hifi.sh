@@ -3,20 +3,19 @@ set -uo pipefail
 export PYTHONHASHSEED=0
 
 NSG=3 ; THREADS=48 ; K_PAIR=33 ; BETA=0.60
-MMX="map-hifi"                                       # ONT was: map-ont
+MMX="map-hifi"
 PY=python3
 PKG=$POLYSPLIT
 PIPE=$PKG/pipeline
 DATA=$DATA/camelina/Hexaploid_data
-LONG_READS=$DATA/TMP24026.hifi.fastq.gz              # HiFi reads
+LONG_READS=$DATA/TMP24026.hifi.fastq.gz
 HIC_R1=$DATA/TMP24026.hic.R1.fastq.gz
 HIC_R2=$DATA/TMP24026.hic.R2.fastq.gz
-REF=$DATA/Cmicrocarpa.CN119205.fa.gz                 # CmiT1 assembly = eval truth
-CHROM_SUBG=$PKG/chrom_subg.hexaploid.tsv             # Chr01-06->S1, Chr07-13->S2, Chr14-20->S3
+REF=$DATA/Cmicrocarpa.CN119205.fa.gz
+CHROM_SUBG=$PKG/chrom_subg.hexaploid.tsv
 WORK=$DATA/polysplit_run_hifi ; mkdir -p "$WORK"
-ASM=$DATA/hifi_asm_flye/assembly.fasta               # EXISTING HiFi assembly -- no Flye
+ASM=$DATA/hifi_asm_flye/assembly.fasta
 
-# tools (nugget-validated)
 BWA=bwa
 SAMTOOLS=samtools
 SEQKIT=seqkit
@@ -25,12 +24,10 @@ GSUFSORT=gsufsort
 
 log(){ echo "### $* | $(date) ###"; }
 
-# ---------------- Stage 1: use the EXISTING HiFi assembly (no Flye) ----------------
 [ -s "$ASM" ] || { echo "!! HiFi assembly not found: $ASM  (run run_hifi_assembly_hexaploid.sh first)"; exit 1; }
 [ -s "$ASM.fai" ] || "$SAMTOOLS" faidx "$ASM"
 log "HiFi assembly: $(grep -c '^>' "$ASM") contigs | preset $MMX | NSG=$NSG"
 
-# total HiFi reads (eval denominator); cached
 if [ -s "$WORK/total_reads.txt" ]; then TOTAL_READS=$(cat "$WORK/total_reads.txt"); else
   log "counting HiFi reads"
   TOTAL_READS=$("$SEQKIT" stats -T -j 8 "$LONG_READS" | awk 'NR==2{print $4}')
@@ -38,7 +35,6 @@ if [ -s "$WORK/total_reads.txt" ]; then TOTAL_READS=$(cat "$WORK/total_reads.txt
 fi
 log "HiFi reads = $TOTAL_READS"
 
-# ---------------- Stage 2: Hi-C -> contig contact graph ----------------
 if [ ! -s "$WORK/contacts.pkl" ]; then
   log "Stage 2: Hi-C contacts (bwa mem on HiFi assembly)"
   [ -s "$ASM.bwt" ] || "$BWA" index "$ASM"
@@ -61,7 +57,6 @@ PY
   "$SAMTOOLS" view "$WORK/hic.nsort.bam" | "$PY" "$WORK/build_contacts.py" "$ASM.fai" "$WORK/contacts.pkl"
 fi
 
-# ---------------- Stage 3: shared-33mer homoeolog edges ----------------
 if [ ! -s "$WORK/homoeolog_edges.tsv" ]; then
   log "Stage 3: gsufsort GSA + LCP (two runs) + homoeolog edges"
   "$GSUFSORT" "$ASM" --fasta --gsa 4 8 --output "$WORK/contigs_k33"
@@ -71,7 +66,6 @@ if [ ! -s "$WORK/homoeolog_edges.tsv" ]; then
         --min-copy 2 --max-copy 6 --out "$WORK/homoeolog_edges.tsv"
 fi
 
-# ---------------- Stage 4-6: blocks -> de-chimerize -> label (K=3) -> recover -> repair ----------------
 if [ ! -s "$WORK/all_contig_labels_repaired.tsv" ]; then
   log "Stage 4-6: blocks/label/repair (NSG=$NSG)"
   export POLYSPLIT_NSG="$NSG" POLYSPLIT_FASTA="$ASM" \
@@ -86,19 +80,16 @@ if [ ! -s "$WORK/all_contig_labels_repaired.tsv" ]; then
   cut -f2 "$WORK/all_contig_labels_repaired.tsv" | tail -n +2 | sort | uniq -c
 fi
 
-# ---------------- Stage 7: reads -> contigs + reads -> ref (HiFi preset) ----------------
 [ -s "$WORK/reads_to_contigs.paf" ] || { log "Stage 7a: reads->contigs ($MMX)"; \
   "$MINIMAP2" -x "$MMX" -t "$THREADS" "$ASM" "$LONG_READS" > "$WORK/reads_to_contigs.paf"; }
 [ -s "$WORK/reads_to_ref.paf" ] || { log "Stage 7b: reads->ref ($MMX, truth)"; \
   "$MINIMAP2" -cx "$MMX" -t "$THREADS" "$REF" "$LONG_READS" > "$WORK/reads_to_ref.paf"; }
 
-# ---------------- Stage 8: propagate contig labels -> reads ----------------
 [ -s "$WORK/read_subg.tsv" ] || { log "Stage 8: propagate"; \
   "$PY" "$PIPE/propagate_to_reads.py" --paf "$WORK/reads_to_contigs.paf" \
         --contig-labels "$WORK/all_contig_labels_repaired.tsv" --min-conf "$BETA" --weight ident \
         --out "$WORK/read_subg.tsv"; }
 
-# ---------------- Stage 9: evaluation (contig + read) ----------------
 log "Stage 9a: per-contig truth + CONTIG accuracy (K=3, HiFi)"
 [ -s "$WORK/contigs_to_ref.paf" ] || \
   "$MINIMAP2" -cx asm10 -t "$THREADS" "$REF" "$ASM" > "$WORK/contigs_to_ref.paf"

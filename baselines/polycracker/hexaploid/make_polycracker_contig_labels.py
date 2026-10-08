@@ -22,7 +22,7 @@ def chunk_to_contig(chunk):
 
 
 contig_cluster_bp = defaultdict(lambda: defaultdict(int))
-cluster_true_bp = defaultdict(lambda: defaultdict(int))      # cluster -> {S1:bp, S2:bp, S3:bp}
+cluster_true_bp = defaultdict(lambda: defaultdict(int))
 for fp in sorted(glob.glob(os.path.join(CLUSTER_DIR, "subgenome_*.txt"))):
     name = os.path.basename(fp).replace(".txt", "")
     for ln in open(fp):
@@ -35,10 +35,6 @@ for fp in sorted(glob.glob(os.path.join(CLUSTER_DIR, "subgenome_*.txt"))):
         if t in SUBS:
             cluster_true_bp[name][t] += bp
 
-# Emit the RAW cluster id as the label and let eval_contig_labels.py / allread_eval.py apply the
-# best one-to-one (bijective) cluster->subgenome mapping, the same rule used for the other baselines.
-# (A per-cluster true-majority oracle is wrong here: all three clusters are S1-plurality mixes, so it
-# would map them all to S1; the bijective best-1:1 is the correct, methodology-consistent score.)
 for name, tb in cluster_true_bp.items():
     print(f"[cluster {name}] truth bp: {dict(tb)}", file=sys.stderr)
 
@@ -46,7 +42,7 @@ n = defaultdict(int)
 with open(OUT, "w") as o:
     o.write("contig\tlabel\ttruth\n")
     for contig, cb in contig_cluster_bp.items():
-        best = max(cb.items(), key=lambda kv: kv[1])[0]      # cluster holding most of this contig's bp
+        best = max(cb.items(), key=lambda kv: kv[1])[0]
         n[best] += 1
         o.write(f"{contig}\t{best}\t{truth.get(contig, '?')}\n")
 

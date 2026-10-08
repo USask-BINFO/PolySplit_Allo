@@ -38,7 +38,6 @@ for s in C_raw:
         continue
     C.add(canon(s))
 
-# remove overlaps (anything appearing in both is not discriminative)
 both = A & C
 A -= both
 C -= both
@@ -54,4 +53,3 @@ with open(sys.argv[4], "w") as out:
 print("A clean:", len(A))
 print("C clean:", len(C))
 print("removed overlaps:", len(both))
-

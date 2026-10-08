@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-"""Fig S3: expected fraction of error-free k-mers per read (identity^k) for each dataset and read type.
-Identity = mean (1 - de) over primary alignments in the first 2 million lines of <run_dir>/reads_to_ref.paf.
-usage: make_kmer_survival.py datasets.tsv out.png"""
 import sys, os, subprocess
 import numpy as np
 import matplotlib

@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-# subgenome-separated assembly: split reads by PolySplit label, assemble + Hi-C-scaffold each subgenome.
-# usage: source config.sh; bash drivers/run_separated_assembly.sh --labels read_subg.tsv --reads R \
-#          --type ont|hifi --work OUTDIR [--hic1 H1 --hic2 H2] [--ref REF --chrom-subg CS]
 set -uo pipefail
 
 LABELS=""; READS=""; TYPE=""; WORK=""; HIC1=""; HIC2=""; REF=""; CHROM_SUBG=""

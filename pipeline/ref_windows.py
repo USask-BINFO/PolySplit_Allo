@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""Cut the anchored chromosomes of a reference into non-overlapping windows, one FASTA per subgenome.
-usage: ref_windows.py ref.fa[.gz] chrom_subg.tsv outdir [window=10000]
-Writes outdir/chroms.<S>.fa (whole chromosomes of subgenome S) and outdir/win.<S>.fa (windows named
-chrom:start-end, 0-based half-open; windows shorter than half a window or with >10% N are skipped)."""
 import sys, gzip, os
 
 ref, cs, out = sys.argv[1], sys.argv[2], sys.argv[3]

@@ -1,16 +1,4 @@
 #!/usr/bin/env python3
-"""Check homoeolog edges and the Hi-C length normalisation against the reference (Tables S10, S11; Fig S4).
-
-Edges: each contig pair in <run_dir>/homoeolog_edges.tsv is classed as syntenic homoeolog (different
-subgenomes, and a 10-kb window of one contig has its best cross-subgenome alignment inside the other
-contig's reference interval), homoeologous chromosomes outside mapped windows, other cross-subgenome,
-same subgenome, or unanchored (a contig that is not pure and anchored). Counts are given over a threshold
-sweep, with and without the strongest-partner rule (edge >= 0.5 x the strongest edge of both contigs).
-Hi-C: for pure, anchored contigs >= 50 kb, Spearman correlation of raw and length-normalised contacts with
-sqrt(l_a l_b), AUC for same- vs different-chromosome pairs, and the share of contigs whose strongest
-partner is on the same chromosome.
-usage: validate_edges.py datasets.tsv OUTDIR [--only KEY]   -> OUTDIR/edges/KEY.json
-"""
 import sys, os, json, pickle, glob, argparse
 from collections import defaultdict, Counter
 import numpy as np

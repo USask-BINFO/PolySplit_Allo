@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# assembly-free control: cluster raw reads by single-copy k-mer incidence, score vs truth.
-# usage: run_readdirect.sh <reads.fq.gz> <reads_to_ref.paf> <chrom_subg.tsv> <nsg> <workdir>
 set -uo pipefail
 READS=$1; PAF=$2; CHROM=$3; NSG=$4; W=$5
 RD=$POLYSPLIT/readdirect

@@ -1,10 +1,4 @@
 #!/usr/bin/env bash
-# Scaffold-first baseline on any assembly: YaHS scaffolding + SubPhaser, then contig labels -> reads.
-# Homoeolog groups are built from a scaffold self-alignment (default) or read from --groups
-# (e.g. true_groups_config.py). Score the output read labels with pipeline/read_accounting.py --label.
-# usage: run_scaffold_first.sh --asm ASM --hic-bam hic.nsort.bam --nsg K --run-dir RUN --score score_subphaser_<x>.py \
-#                              --work OUT [--groups FILE] [--prefix P]
-#   RUN must hold reads_to_contigs.paf and wg_purity.per_contig.tsv for ASM (from run_polysplit.sh --ref ...)
 set -uo pipefail
 ASM=""; BAM=""; NSG=""; RUN=""; SCORE=""; WORK=""; GROUPS=""; PRE=scaf
 while [ $# -gt 0 ]; do
@@ -23,7 +17,7 @@ SCAF=${PRE}_scaffolds_final.fa
 [ -s "$SCAF" ] || yahs "$ASM" "$BAM" -o "$PRE"
 [ -s "$SCAF.fai" ] || samtools faidx "$SCAF"
 
-if [ -z "$GROUPS" ]; then                       # groups from a self-alignment of scaffolds >= MINLEN
+if [ -z "$GROUPS" ]; then
   if [ ! -s groups.config ]; then
     awk -v m=$MINLEN '$2>=m{print $1}' "$SCAF.fai" > big.txt
     samtools faidx "$SCAF" $(cat big.txt) > big.fa
@@ -36,7 +30,7 @@ if [ -z "$GROUPS" ]; then                       # groups from a self-alignment o
 fi
 
 SGOUT=$(find "$WORK" -name '*chrom-subgenome.tsv' | head -1)
-if [ -z "$SGOUT" ]; then                        # the R heatmap step may fail; the table is written before it
+if [ -z "$SGOUT" ]; then
   set +u; source "$CONDA"; conda activate "$SPENV"; set -u
   subphaser -i "$SCAF" -c "$GROUPS" -nsg "$NSG" -just_core -pre ${PRE}_ -o phase-results -tmpdir tmp_subphaser -p "$THREADS"
   set +u; conda deactivate; set -u

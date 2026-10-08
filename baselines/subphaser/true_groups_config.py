@@ -1,11 +1,4 @@
 #!/usr/bin/env python3
-"""SubPhaser config with the true homoeologous groups, taken from the reference (reference-informed variant
-of the scaffold-first baseline, Table S12).
-Chromosomes of the first subgenome are matched one-to-one to those of each other subgenome by the number of
-10-kb windows whose cross-subgenome alignment lands on them (windows/cross.*.paf from
-drivers/run_reference_annotation.sh). Each scaffold >= MINLEN is placed on its majority chromosome and each
-group takes the longest scaffold of each member chromosome; only complete groups are written.
-usage: true_groups_config.py <scaffolds prefix (.fa.fai, .agp)> contigs_to_ref.paf chrom_subg.tsv windows_dir out.config [minlen]"""
 import sys, glob
 from collections import defaultdict, Counter
 import numpy as np

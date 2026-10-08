@@ -7,7 +7,7 @@ from decloud_blocks_v2 import (contig_repeat_counts, label_eval,
                                MIN_LEN, MIN_BLOCK, MIN_SUB, K, MC_CONTIG,
                                RES, SUBRES, PAIR_MIN, MAX_ITERS)
 
-NSG = int(os.environ.get("POLYSPLIT_NSG", "2"))    # number of subgenomes (K)
+NSG = int(os.environ.get("POLYSPLIT_NSG", "2"))
 FASTA = os.environ.get("POLYSPLIT_FASTA", "../flye_out/assembly.fasta")
 TRUTH = os.environ.get("POLYSPLIT_TRUTH", "../purity_compare/wg_purity.per_contig.tsv")
 CONTACTS = os.environ.get("POLYSPLIT_CONTACTS", "contacts.pkl")
@@ -22,7 +22,7 @@ def structural_dechimerize(blocks, G, strong_edges, lengths, verbose=True):
         for com in blocks:
             sub = G.subgraph(com)
             if sub.number_of_edges() == 0 or sub.size(weight="weight") == 0:
-                parts = [list(com)]          # edgeless/zero-weight subgraph: cannot re-cluster, keep whole
+                parts = [list(com)]
             else:
                 parts = [list(c) for c in louvain_communities(sub, weight="weight",
                                                               resolution=SUBRES, seed=1)]
@@ -30,7 +30,7 @@ def structural_dechimerize(blocks, G, strong_edges, lengths, verbose=True):
             seam = None
             if len(big) >= 2:
                 part_of = {c: i for i, p in enumerate(big) for c in p}
-                for a, b, w in strong_edges:        # STRONG homoeolog edge between two big halves?
+                for a, b, w in strong_edges:
                     if a in part_of and b in part_of and part_of[a] != part_of[b]:
                         seam = (a, b, w)
                         break
@@ -39,7 +39,7 @@ def structural_dechimerize(blocks, G, strong_edges, lengths, verbose=True):
                 changed = True
                 assigned = {c for p in big for c in p}
                 result = [list(p) for p in big]
-                for c in com:                        # attach small leftovers to most Hi-C-linked piece
+                for c in com:
                     if c in assigned:
                         continue
                     best, bw = 0, -1.0
@@ -66,16 +66,12 @@ def main():
     with open(CONTACTS, "rb") as f:
         contacts, lengths = pickle.load(f)
     truth = {}
-    if os.path.exists(TRUTH):                          # truth is eval-only; tolerate absence
+    if os.path.exists(TRUTH):
         with open(TRUTH) as f:
             next(f)
             for line in f:
                 c, L, a, cc_, mf, kls = line.rstrip("\n").split("\t")
-                if kls.startswith("pure_"): truth[c] = kls.split("_", 1)[1]   # any K
-    # strongest-partner filter: a contig's true homoeolog is its dominant partner; within-subgenome
-    # paralog/repeat edges (much weaker) are dropped so they cannot flip the subgenome-contrast on
-    # highly contiguous (e.g. HiFi) assemblies. No-op on fragmented assemblies, where they are
-    # already below PAIR_MIN. FRAC via POLYSPLIT_EDGE_FRAC (default 0.5).
+                if kls.startswith("pure_"): truth[c] = kls.split("_", 1)[1]
     FRAC = float(os.environ.get("POLYSPLIT_EDGE_FRAC", "0.5"))
     raw = []; mx = {}
     with open(EDGES) as f:
@@ -115,7 +111,6 @@ def main():
     label_eval(base_blocks, cc, lengths, top, truth, "baseline (no decloud)", nsg=NSG)
     cl, _, _ = label_eval(bl, cc, lengths, top, truth, "structural de-chimerize", nsg=NSG)
 
-    # write contig A/C labels in the same format decloud_blocks_v2.py emits (drop-in for the pipeline)
     out = "decloud_structural_contig_labels.tsv"
     with open(out, "w") as o:
         o.write("contig\tlabel\ttruth\n")

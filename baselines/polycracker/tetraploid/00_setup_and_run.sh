@@ -7,12 +7,10 @@ GENOME=Cmi4x_flye.fa
 WORK="$BASE/pc_work"
 mkdir -p "$WORK"
 
-# stage the SAME assembly PolySplit used (real file, not symlink -- udocker mounts $WORK)
 [ -s "$WORK/$GENOME" ] || cp "$FLYE" "$WORK/$GENOME"
 echo "staged $GENOME ($(du -h "$WORK/$GENOME" | cut -f1)) in $WORK"
-md5sum "$FLYE" "$WORK/$GENOME"   # confirm identical to PolySplit's input
+md5sum "$FLYE" "$WORK/$GENOME"
 
-# run polyCRACKER: genome, n_subgenomes=2, chunk=100kb  (identical config to napus)
 WORK="$WORK" bash "$DRIVER" "$GENOME" 2 100000
 
 echo "DONE -> $WORK/analysisOutputs_${GENOME%.fa}_n2/"
