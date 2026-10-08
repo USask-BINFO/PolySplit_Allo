@@ -27,7 +27,7 @@ def main():
     labels = sorted(set(clab.values()))
     print(f"[labels] {len(clab)} labelled contigs across {len(labels)} subgenomes: {labels}", file=sys.stderr)
 
-    score = defaultdict(lambda: defaultdict(float))
+    score = defaultdict(lambda: defaultdict(float))   # read -> {subgenome: weight}
     n = 0
     with open(args.paf) as f:
         for line in f:
@@ -64,7 +64,7 @@ def main():
             o.write(f"{r}\t{lab}\t{conf:.3f}\t{wstr}\n")
     print(f"[reads] {dict(counts)}  (min-conf {args.min_conf})", file=sys.stderr)
 
-    if args.compare:
+    if args.compare:                                   # cross-check vs another label set (any names)
         ref = {}
         with open(args.compare) as f:
             for line in f:

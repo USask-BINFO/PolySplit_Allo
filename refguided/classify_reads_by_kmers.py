@@ -12,6 +12,7 @@ def iter_reads_auto(path):
         if not first:
             return
 
+        # FASTA
         if first.startswith(">"):
             rid = first[1:].strip().split()[0]
             chunks = []
@@ -28,6 +29,7 @@ def iter_reads_auto(path):
             if rid is not None:
                 yield rid, "".join(chunks)
 
+        # FASTQ (assumes 4-line records; standard SRA FASTQ is like this)
         elif first.startswith("@"):
             h = first
             while True:
@@ -73,9 +75,11 @@ def load_signature_codes(path, k, tbl):
             line = line.strip()
             if not line or line.startswith(">"):
                 continue
+            # allow either: pure k-mer lines, or fasta sequences lines
             if len(line) < k:
                 continue
             if len(line) != k:
+                # if someone gave longer lines, ignore (safer) or take first k
                 line = line[:k]
             code = kmer_canon_code(line, k, tbl)
             if code is not None:
@@ -99,14 +103,18 @@ def main():
     k = args.k
     tbl = build_base_table()
 
+    # Load signatures as canonical integer codes
     A = load_signature_codes(args.A_sig, k, tbl)
     C = load_signature_codes(args.C_sig, k, tbl)
 
+    # Remove overlaps (non-discriminative)
     both = A & C
     if both:
         A -= both
         C -= both
 
+    # Build one lookup dict (one hash lookup per k-mer instead of two)
+    # 0 => A, 1 => C
     lab = {}
     for x in A:
         lab[x] = 0
@@ -124,6 +132,7 @@ def main():
             n_reads += 1
             L = len(seq)
 
+            # quick skip
             if L < k or (args.min_len and L < args.min_len):
                 o.write(f"{rid}\t0\t0\tambiguous\n")
                 if args.progress and (n_reads % args.progress == 0):
@@ -138,9 +147,11 @@ def main():
             Ah = 0
             Ch = 0
 
+            # scan with rolling codes
             for i, ch in enumerate(bseq):
                 b = tbl[ch]
                 if b < 0:
+                    # reset on N or non-ACGT
                     fwd = 0
                     rev = 0
                     valid = 0
@@ -162,6 +173,7 @@ def main():
                     elif g == 1:
                         Ch += 1
 
+            # decision rule
             label = "ambiguous"
             if Ah >= args.min_hits or Ch >= args.min_hits:
                 if Ah >= args.ratio * (Ch + 1):

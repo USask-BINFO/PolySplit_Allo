@@ -7,6 +7,7 @@ CLUSTER_DIR = sys.argv[1] if len(sys.argv) > 1 else \
 OUT = sys.argv[2] if len(sys.argv) > 2 else "polycracker_contig_labels.tsv"
 TRUTH = "$DATA/Napus_nam_denovo/sa_read_correct/purity_compare/wg_purity.per_contig.tsv"
 
+# oracle cluster -> subgenome (from eval_polycracker_denovo.py: sg0 majority A, sg1 majority C)
 ORACLE = {"subgenome_0": "A", "subgenome_1": "C"}
 
 truth = {}

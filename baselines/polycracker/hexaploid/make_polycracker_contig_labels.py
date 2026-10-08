@@ -22,7 +22,7 @@ def chunk_to_contig(chunk):
 
 
 contig_cluster_bp = defaultdict(lambda: defaultdict(int))
-cluster_true_bp = defaultdict(lambda: defaultdict(int))
+cluster_true_bp = defaultdict(lambda: defaultdict(int))      # cluster -> {S1:bp, S2:bp, S3:bp}
 for fp in sorted(glob.glob(os.path.join(CLUSTER_DIR, "subgenome_*.txt"))):
     name = os.path.basename(fp).replace(".txt", "")
     for ln in open(fp):
@@ -35,6 +35,7 @@ for fp in sorted(glob.glob(os.path.join(CLUSTER_DIR, "subgenome_*.txt"))):
         if t in SUBS:
             cluster_true_bp[name][t] += bp
 
+# raw cluster id as label; the evaluation maps clusters to subgenomes one-to-one
 for name, tb in cluster_true_bp.items():
     print(f"[cluster {name}] truth bp: {dict(tb)}", file=sys.stderr)
 
@@ -42,7 +43,7 @@ n = defaultdict(int)
 with open(OUT, "w") as o:
     o.write("contig\tlabel\ttruth\n")
     for contig, cb in contig_cluster_bp.items():
-        best = max(cb.items(), key=lambda kv: kv[1])[0]
+        best = max(cb.items(), key=lambda kv: kv[1])[0]      # cluster holding most of this contig's bp
         n[best] += 1
         o.write(f"{contig}\t{best}\t{truth.get(contig, '?')}\n")
 

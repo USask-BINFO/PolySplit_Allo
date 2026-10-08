@@ -89,6 +89,7 @@ def main():
     k = args.k
     tbl = build_base_table()
     sets = [load_codes(args.S1_sig, k, tbl), load_codes(args.S2_sig, k, tbl), load_codes(args.S3_sig, k, tbl)]
+    # drop any code present in >1 set (defensive; clean step should already ensure disjoint)
     from collections import Counter
     seen = Counter()
     for S in sets:

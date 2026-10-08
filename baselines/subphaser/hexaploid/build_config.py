@@ -23,7 +23,7 @@ for ln in open(PAIRS):
         score[(a, b)] = score[(b, a)] = max(score[(a, b)], s)
 
 used = set(); groups = []
-for a in big:
+for a in big:                                            # largest scaffolds anchor groups first
     if a in used:
         continue
     partners = sorted([x for x in big if x not in used and x != a and score.get((a, x), 0) > 0],
@@ -32,6 +32,7 @@ for a in big:
         grp = [a] + partners[:NSG - 1]
         groups.append(grp); used.update(grp)
 
+# leftover scaffolds with no scored partners: pack into NSG-rows so SubPhaser still sees them
 leftover = [s for s in big if s not in used]
 for i in range(0, len(leftover) - (len(leftover) % NSG), NSG):
     groups.append(leftover[i:i + NSG]); used.update(leftover[i:i + NSG])

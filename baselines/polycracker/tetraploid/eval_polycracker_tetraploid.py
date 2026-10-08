@@ -6,6 +6,7 @@ CLUSTER_DIR = sys.argv[1] if len(sys.argv) > 1 else \
     "pc_work/analysisOutputs_Cmi4x_flye_n2/SpectralClusteringmain_tsne_2_n3/clusterResults"
 TRUTH = "$DATA/camelina/Tetraploid_data/polysplit_run/wg_purity.per_contig.tsv"
 
+# ---- truth: contig -> 'S1'/'S2' (pure only) ; clen for all contigs ----
 truth = {}
 clen = {}
 total_assembly_bp = 0
@@ -38,6 +39,7 @@ for fp in files:
         contig_cluster_bp[contig][name] += bp
     cluster_chunks[name] = rows
 
+# ---- (1) cluster-level oracle on clustered chunks ----
 print("== clusters ==")
 clustered_bp = oracle_correct = scored_bp = 0
 cluster_label = {}
@@ -58,6 +60,7 @@ print(f"(1) cluster-oracle accuracy (clustered, pure-contig bp): "
 print(f"(2) genome coverage clustered: {100*clustered_bp/total_assembly_bp:.1f}%   "
       f"({clustered_bp/1e6:.0f} of {total_assembly_bp/1e6:.0f} Mb)")
 
+# ---- (3) contig-level oracle over the WHOLE assembly (unchunked = wrong) ----
 contig_correct = contig_total = n_unassigned = unassigned_bp = 0
 for c, t in truth.items():
     L = clen[c]; contig_total += L

@@ -24,9 +24,9 @@ def main():
                 cmap[p[0]] = p[1]
 
     def subg(t):
-        if cmap:
-            return cmap.get(t)
-        tok = t.split(".")[-1]
+        if cmap:                       # explicit map given: only mapped chroms carry a truth
+            return cmap.get(t)         # None for unmapped targets (e.g. unplaced scaffolds)
+        tok = t.split(".")[-1]         # no map -> derive subgenome from chrom name (B. napus A/C)
         return tok[:1] if tok[:1].isalpha() else None
 
     lab = {}
@@ -37,8 +37,8 @@ def main():
             if len(p) >= 2:
                 lab[p[0]] = p[1]
 
-    tscore = defaultdict(lambda: defaultdict(int))
-    seen = set()
+    tscore = defaultdict(lambda: defaultdict(int))     # read -> {subgenome: matched bases}
+    seen = set()                                       # reads aligning to ANY reference sequence
     with open(a.ref_paf) as f:
         for ln in f:
             p = ln.split("\t")
@@ -46,7 +46,7 @@ def main():
                 continue
             seen.add(p[0])
             sg = subg(p[5])
-            if sg is None:
+            if sg is None:                             # mapped only to unplaced/un-mapped seq -> no truth
                 continue
             try:
                 nm = int(p[9])

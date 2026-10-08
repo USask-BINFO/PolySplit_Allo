@@ -14,6 +14,7 @@ big = sorted([s for s, L in length.items() if L >= MINLEN], key=lambda s: -lengt
 bigset = set(big)
 print(f"[config] {len(big)} scaffolds >= {MINLEN/1e6:.0f} Mb", file=sys.stderr)
 
+# greedy max-score matching restricted to big scaffolds
 cand = []
 for ln in open(PAIRS):
     p = ln.rstrip("\n").split("\t")
@@ -29,6 +30,7 @@ for score, a, b in cand:
     pairs.append((a, b)); used.add(a); used.add(b)
 
 unmatched = [s for s in big if s not in used]
+# pair leftover scaffolds with each other (no self-aln link) so all are included
 for i in range(0, len(unmatched) - 1, 2):
     pairs.append((unmatched[i], unmatched[i+1]))
     used.add(unmatched[i]); used.add(unmatched[i+1])

@@ -16,6 +16,7 @@ cs = sorted(d)
 if len(cs) < 4:
     print(CI, 3 * CI); sys.exit()
 
+# valley = first local minimum after the error-tail decline
 valley = None
 for i in range(1, len(cs) - 1):
     if d[cs[i - 1]] > d[cs[i]] and d[cs[i + 1]] >= d[cs[i]]:

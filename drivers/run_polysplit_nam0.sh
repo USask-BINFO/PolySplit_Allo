@@ -2,6 +2,7 @@
 set -uo pipefail
 export PYTHONHASHSEED=0
 
+# ---------------- config (edit paths only if running off nugget) ----------------
 NSG=2 ; THREADS=48 ; K_PAIR=33 ; BETA=0.60
 PY=python3
 PKG=$POLYSPLIT
@@ -11,11 +12,12 @@ LONG_READS=$DATA/ont/n99_all.fastq.gz
 HIC_R1=$DATA/hic/S00E51E_r1.fastq.gz
 HIC_R2=$DATA/hic/S00E51E_r2.fastq.gz
 TOTAL_READS=5725172
-REF=$DATA/assembly/Bnapus_N99_hifi.genome.fasta
-CHROM_SUBG=$DATA/chrom_subg.nam0.tsv
+REF=$DATA/assembly/Bnapus_N99_hifi.genome.fasta      # N99 HiFi assembly = eval truth
+CHROM_SUBG=$DATA/chrom_subg.nam0.tsv                 # N1-N10 -> A, N11-N19 -> C
 WORK=$DATA/polysplit_run ; mkdir -p "$WORK"
 ASM=$WORK/flye_out/assembly.fasta
 
+# tools (nugget-validated)
 FLYE_BIN=${FLYE_BIN:-/path/to/flye/bin}
 BWA=bwa
 SAMTOOLS=samtools
@@ -24,8 +26,10 @@ GSUFSORT=gsufsort
 
 log(){ echo "### $* | $(date) ###"; }
 
+# ---------------- Stage 1: de-novo assembly (Flye) ----------------
 if [ ! -s "$ASM" ]; then
   export PATH="$FLYE_BIN:$PATH"
+  # pre-warm the flye helper binaries (first exec over NFS can fail)
   flye --version          >/dev/null 2>&1 || true
   flye-samtools --version >/dev/null 2>&1 || true
   flye-modules --help     >/dev/null 2>&1 || true
@@ -41,6 +45,7 @@ fi
 [ -s "$ASM.fai" ] || "$SAMTOOLS" faidx "$ASM"
 log "contigs: $(grep -c '^>' "$ASM") "
 
+# ---------------- Stage 2: Hi-C -> contig contact graph ----------------
 if [ ! -s "$WORK/contacts.pkl" ]; then
   log "Stage 2: Hi-C contacts"
   [ -s "$ASM.bwt" ] || "$BWA" index "$ASM"
@@ -63,6 +68,7 @@ PY
   "$SAMTOOLS" view "$WORK/hic.nsort.bam" | "$PY" "$WORK/build_contacts.py" "$ASM.fai" "$WORK/contacts.pkl"
 fi
 
+# ---------------- Stage 3: shared-33mer homoeolog edges (gsufsort + LCP walk) ----------------
 if [ ! -s "$WORK/homoeolog_edges.tsv" ]; then
   log "Stage 3: gsufsort GSA + LCP (two runs; combining --gsa+--lcp drops the LCP)"
   "$GSUFSORT" "$ASM" --fasta --gsa 4 8 --output "$WORK/contigs_k33"
@@ -73,11 +79,12 @@ if [ ! -s "$WORK/homoeolog_edges.tsv" ]; then
         --min-copy 2 --max-copy 6 --out "$WORK/homoeolog_edges.tsv"
 fi
 
+# ---------------- Stage 4-6: blocks -> de-chimerize -> label (S1/S2) -> recover -> repair ----------------
 if [ ! -s "$WORK/all_contig_labels_repaired.tsv" ]; then
   log "Stage 4-6: blocks/label/repair"
   export POLYSPLIT_NSG="$NSG" POLYSPLIT_FASTA="$ASM" \
          POLYSPLIT_CONTACTS="$WORK/contacts.pkl" POLYSPLIT_EDGES="$WORK/homoeolog_edges.tsv" \
-         POLYSPLIT_TRUTH=/none
+         POLYSPLIT_TRUTH=/none                                   # per-contig truth optional; eval below
   ( cd "$WORK"
     "$PY" "$PIPE/dechimerize_structural.py"
     POLYSPLIT_OUT="$WORK/all_contig_labels_v2.tsv" \
@@ -87,16 +94,19 @@ if [ ! -s "$WORK/all_contig_labels_repaired.tsv" ]; then
   cut -f2 "$WORK/all_contig_labels_repaired.tsv" | tail -n +2 | sort | uniq -c
 fi
 
+# ---------------- Stage 7: reads -> contigs PAF + reads -> ref PAF ----------------
 [ -s "$WORK/reads_to_contigs.paf" ] || { log "Stage 7a: reads->contigs"; \
   "$MINIMAP2" -x map-ont -t "$THREADS" "$ASM" "$LONG_READS" > "$WORK/reads_to_contigs.paf"; }
 [ -s "$WORK/reads_to_ref.paf" ] || { log "Stage 7b: reads->ref (truth)"; \
   "$MINIMAP2" -cx map-ont -t "$THREADS" "$REF" "$LONG_READS" > "$WORK/reads_to_ref.paf"; }
 
+# ---------------- Stage 8: propagate contig labels -> reads ----------------
 [ -s "$WORK/read_subg.tsv" ] || { log "Stage 8: propagate"; \
   "$PY" "$PIPE/propagate_to_reads.py" --paf "$WORK/reads_to_contigs.paf" \
         --contig-labels "$WORK/all_contig_labels_repaired.tsv" --min-conf "$BETA" --weight ident \
         --out "$WORK/read_subg.tsv"; }
 
+# ---------------- Stage 9: evaluation (contig + read level) ----------------
 log "Stage 9a: per-contig truth + CONTIG accuracy"
 [ -s "$WORK/contigs_to_ref.paf" ] || \
   "$MINIMAP2" -cx asm10 -t "$THREADS" "$REF" "$ASM" > "$WORK/contigs_to_ref.paf"

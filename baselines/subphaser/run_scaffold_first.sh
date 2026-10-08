@@ -17,7 +17,7 @@ SCAF=${PRE}_scaffolds_final.fa
 [ -s "$SCAF" ] || yahs "$ASM" "$BAM" -o "$PRE"
 [ -s "$SCAF.fai" ] || samtools faidx "$SCAF"
 
-if [ -z "$GROUPS" ]; then
+if [ -z "$GROUPS" ]; then                       # groups from a self-alignment of scaffolds >= MINLEN
   if [ ! -s groups.config ]; then
     awk -v m=$MINLEN '$2>=m{print $1}' "$SCAF.fai" > big.txt
     samtools faidx "$SCAF" $(cat big.txt) > big.fa
@@ -30,7 +30,7 @@ if [ -z "$GROUPS" ]; then
 fi
 
 SGOUT=$(find "$WORK" -name '*chrom-subgenome.tsv' | head -1)
-if [ -z "$SGOUT" ]; then
+if [ -z "$SGOUT" ]; then                        # the R heatmap step may fail; the table is written before it
   set +u; source "$CONDA"; conda activate "$SPENV"; set -u
   subphaser -i "$SCAF" -c "$GROUPS" -nsg "$NSG" -just_core -pre ${PRE}_ -o phase-results -tmpdir tmp_subphaser -p "$THREADS"
   set +u; conda deactivate; set -u

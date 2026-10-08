@@ -32,11 +32,13 @@ def main():
     docs = np.asarray(gsa["doc"])
     print(f"[sa] {n:,} suffixes; {len(names):,} contigs", file=sys.stderr)
 
-    bnd = np.flatnonzero(np.asarray(lcp) < args.k)
+    bnd = np.flatnonzero(np.asarray(lcp) < args.k)        # block starts (new k-mer)
     sizes = np.diff(np.append(bnd, n))
     nc = len(names)
     edges = Counter()
 
+    # --- FAST vectorized path for copy==2 k-mers (a 33-mer shared by exactly 2 contigs = a clean
+    #     homoeolog/paralog pair); this is the bulk of the discriminating signal ---
     s2 = bnd[sizes == 2]
     da, db = docs[s2].astype(np.int64), docs[s2 + 1].astype(np.int64)
     diff = da != db
@@ -48,6 +50,7 @@ def main():
         edges[(kk // nc, kk % nc)] += c
     print(f"[copy2] {len(s2):,} copy-2 k-mers -> {len(edges):,} pairs", file=sys.stderr)
 
+    # --- loop the rarer copy 3..max_copy blocks (few) ---
     if args.max_copy >= 3:
         sel = np.flatnonzero((sizes >= 3) & (sizes <= args.max_copy))
         if args.sample > 1:

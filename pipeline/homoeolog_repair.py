@@ -8,13 +8,13 @@ TRUTH = os.environ.get("POLYSPLIT_TRUTH", "../purity_compare/wg_purity.per_conti
 EDGES = os.environ.get("POLYSPLIT_EDGES", "homoeolog_edges.tsv")
 LABELS_IN = os.environ.get("POLYSPLIT_LABELS_IN", "all_contig_labels_v2.tsv")
 OUT = os.environ.get("POLYSPLIT_OUT", "all_contig_labels_repaired.tsv")
-EDGE_MIN = int(os.environ.get("POLYSPLIT_PAIR_MIN", "100000"))
-MARGIN = 1.0
+EDGE_MIN = int(os.environ.get("POLYSPLIT_PAIR_MIN", "100000"))   # strong homoeolog twins only (= tau_H)
+MARGIN = 1.0        # flip iff same-label twin weight > other-label twin weight
 
 with open(CONTACTS, "rb") as f:
     _, lengths = pickle.load(f)
 ctruth = {}
-if os.path.exists(TRUTH):
+if os.path.exists(TRUTH):                                   # truth is eval-only; tolerate absence
     with open(TRUTH) as f:
         next(f)
         for ln in f:
@@ -46,6 +46,7 @@ def acc(lab, tag):
 def repair(edge_min, margin=1.0):
     lab = load_labels()
     labels_present = sorted(set(lab.values()))
+    # same strongest-partner filter as in the labelling step
     FRAC = float(os.environ.get("POLYSPLIT_EDGE_FRAC", "0.5"))
     raw = []; mx = {}
     with open(EDGES) as f:
@@ -55,6 +56,7 @@ def repair(edge_min, margin=1.0):
             raw.append((a, b, w))
             if w > mx.get(a, 0): mx[a] = w
             if w > mx.get(b, 0): mx[b] = w
+    # pair_mode.txt = mutual: use only edges among the K-1 strongest of both contigs
     nk = max(1, int(os.environ.get("POLYSPLIT_NSG", str(len(labels_present)))) - 1)
     ws = defaultdict(list)
     for a, b, w in raw:
@@ -73,14 +75,14 @@ def repair(edge_min, margin=1.0):
     for _ in range(20):
         changed = False
         for c in list(nbrs):
-            tw = defaultdict(float)
+            tw = defaultdict(float)                          # strong-twin weight per subgenome
             for p, w in nbrs[c]:
                 tw[lab[p]] += w
             cur = lab[c]
             same = tw.get(cur, 0.0)
             other = sum(v for l, v in tw.items() if l != cur)
             if same > other * margin and same > 0 and len(labels_present) > 1:
-                target = min(labels_present, key=lambda l: tw.get(l, 0.0))
+                target = min(labels_present, key=lambda l: tw.get(l, 0.0))   # twins occupy this least
                 if target != cur:
                     lab[c] = target; nflip += 1; changed = True
         if not changed:

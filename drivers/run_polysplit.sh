@@ -39,6 +39,7 @@ if [ "$ASSEMBLER" = hifiasm ]; then
 fi
 log(){ echo "### $* | $(date) ###"; }
 
+# Stage 1: de-novo assembly
 if [ "$ASSEMBLER" = hifiasm ] && [ ! -s "$ASM" ]; then
   log "Stage 1: hifiasm -l0"
   mkdir -p "$WORK/hifiasm"
@@ -58,6 +59,7 @@ if [ ! -s "$ASM" ]; then
 fi
 [ -s "$ASM.fai" ] || "$SAMTOOLS" faidx "$ASM"
 
+# Stage 2: Hi-C -> contig contact graph
 if [ ! -s "$WORK/contacts.pkl" ]; then
   log "Stage 2: Hi-C contacts"
   [ -s "$ASM.bwt" ] || "$BWA" index "$ASM"
@@ -79,6 +81,7 @@ PY
   "$SAMTOOLS" view "$WORK/hic.nsort.bam" | "$PY" "$WORK/build_contacts.py" "$ASM.fai" "$WORK/contacts.pkl"
 fi
 
+# Stage 3: shared-33mer homoeolog edges (gsufsort GSA + LCP)
 if [ ! -s "$WORK/homoeolog_edges.tsv" ]; then
   log "Stage 3: gsufsort GSA+LCP -> homoeolog edges"
   "$GSUFSORT" "$ASM" --fasta --gsa 4 8 --output "$WORK/contigs_k33"
@@ -88,6 +91,7 @@ if [ ! -s "$WORK/homoeolog_edges.tsv" ]; then
         --min-copy 2 --max-copy 6 --out "$WORK/homoeolog_edges.tsv"
 fi
 
+# Stage 4-6: Hi-C blocks -> de-chimerize -> label (K subgenomes) -> recover -> repair
 if [ ! -s "$WORK/all_contig_labels_repaired.tsv" ]; then
   log "Stage 4-6: blocks/label/repair (NSG=$NSG)"
   export POLYSPLIT_NSG="$NSG" POLYSPLIT_FASTA="$ASM" \
@@ -102,15 +106,18 @@ if [ ! -s "$WORK/all_contig_labels_repaired.tsv" ]; then
   cut -f2 "$WORK/all_contig_labels_repaired.tsv" | tail -n +2 | sort | uniq -c
 fi
 
+# Stage 7: reads -> contigs
 [ -s "$WORK/reads_to_contigs.paf" ] || { log "Stage 7: reads->contigs"; \
   "$MINIMAP2" -x "$MMX" -t "$THREADS" "$ASM" "$READS" > "$WORK/reads_to_contigs.paf"; }
 
+# Stage 8: propagate contig labels -> reads
 [ -s "$WORK/read_subg.tsv" ] || { log "Stage 8: propagate labels to reads"; \
   "$PY" "$PIPE/propagate_to_reads.py" --paf "$WORK/reads_to_contigs.paf" \
         --contig-labels "$WORK/all_contig_labels_repaired.tsv" --min-conf "$BETA" --weight ident \
         --out "$WORK/read_subg.tsv"; }
 log "per-read subgenome labels -> $WORK/read_subg.tsv"
 
+# Stage 9: evaluation (optional; only when a reference and chrom->subgenome map are given)
 if [ -n "$REF" ] && [ -n "$CHROM_SUBG" ]; then
   log "Stage 9: evaluation vs reference"
   [ -s "$WORK/contigs_to_ref.paf" ] || "$MINIMAP2" -cx asm10 -t "$THREADS" "$REF" "$ASM" > "$WORK/contigs_to_ref.paf"

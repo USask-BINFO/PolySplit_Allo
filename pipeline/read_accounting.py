@@ -29,6 +29,7 @@ def load_map(path):
 
 
 def parse_paf(paf, cmap, cache):
+    """read -> (truth, primary target, primary midpoint, primary MAPQ, read length)"""
     if os.path.exists(cache):
         return pickle.load(open(cache, "rb"))
     sums = defaultdict(lambda: defaultdict(int)); prim = {}; mapped = set()
@@ -60,6 +61,8 @@ def parse_paf(paf, cmap, cache):
 
 
 def load_labels(path):
+    """read -> subgenome label, 'ambiguous' or 'unassigned'. Files with *_hits columns (PolySplit-Ref):
+    a no-call with zero hits is unassigned. Reads absent from a file are unassigned."""
     lab = {}
     with open(path) as f:
         hdr = f.readline().rstrip("\n").split("\t")

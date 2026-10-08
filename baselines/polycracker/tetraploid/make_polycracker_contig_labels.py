@@ -18,8 +18,9 @@ def chunk_to_contig(chunk):
     contig, start, end = chunk.rsplit("_", 2)
     return contig, int(end) - int(start)
 
+# read clusters
 contig_cluster_bp = defaultdict(lambda: defaultdict(int))
-cluster_true_bp = defaultdict(lambda: defaultdict(int))
+cluster_true_bp = defaultdict(lambda: defaultdict(int))   # cluster -> {S1:bp, S2:bp}
 for fp in sorted(glob.glob(os.path.join(CLUSTER_DIR, "subgenome_*.txt"))):
     name = os.path.basename(fp).replace(".txt", "")
     for ln in open(fp):
@@ -31,12 +32,13 @@ for fp in sorted(glob.glob(os.path.join(CLUSTER_DIR, "subgenome_*.txt"))):
         if t in ("S1", "S2"):
             cluster_true_bp[name][t] += bp
 
+# dynamic oracle: each cluster -> its true-majority subgenome
 ORACLE = {}
 for name, tb in cluster_true_bp.items():
     ORACLE[name] = "S1" if tb.get("S1", 0) >= tb.get("S2", 0) else "S2"
 for name in list(contig_cluster_bp):
     for cl in contig_cluster_bp[name]:
-        ORACLE.setdefault(cl, "S1")
+        ORACLE.setdefault(cl, "S1")   # cluster with no pure-contig bp: arbitrary
 print(f"[oracle] {ORACLE}", file=sys.stderr)
 
 n = defaultdict(int)

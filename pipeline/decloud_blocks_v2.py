@@ -11,9 +11,9 @@ for ch, v in zip(b"ACGTacgt", [0, 1, 2, 3, 0, 1, 2, 3]):
 MIN_LEN, MIN_BLOCK, MIN_SUB = 50000, 3000000, 1000000
 K, MC_CONTIG, MC_BLOCK = 15, 2, 10
 RES, SUBRES = 2.5, 5.0
-PAIR_MIN = int(os.environ.get("POLYSPLIT_PAIR_MIN", "100000"))
+PAIR_MIN = int(os.environ.get("POLYSPLIT_PAIR_MIN", "100000"))   # tau_H, strong homoeolog edge
 MAX_ITERS = 4
-SWEEP = [(100000, 1), (50000, 2), (30000, 3), (20000, 3), (20000, 5)]
+SWEEP = [(100000, 1), (50000, 2), (30000, 3), (20000, 3), (20000, 5)]   # (edge_min, min_edges)
 
 
 def contig_repeat_counts(seq, k, mc):
@@ -58,6 +58,7 @@ def enforce_pairs(score, pairs, nb, iters=500):
 
 
 def k_colourable(edges, k, max_steps=2000000):
+    """True if the graph can be coloured with k colours (exact backtracking; small graphs)."""
     adj = defaultdict(set)
     for a, b in edges:
         adj[a].add(b); adj[b].add(a)
@@ -80,6 +81,7 @@ def k_colourable(edges, k, max_steps=2000000):
 
 
 def mutual_top_pairs(bpw, k):
+    """Pairs in which each block is among the other's k-1 strongest partners."""
     part = defaultdict(list)
     for (i, j), w in bpw.items():
         part[i].append((w, j)); part[j].append((w, i))
@@ -112,7 +114,7 @@ def dechimerize(blocks, G, hedges, lengths, edge_min, min_edges):
                     if rem:
                         new[-1].extend(rem)
                 else:
-                    new.append(com)
+                    new.append(com)          # couldn't split -> keep
             else:
                 new.append(com)
         if len(new) == len(blocks):
@@ -150,6 +152,7 @@ def label_eval(blocks, cc, lengths, top, truth, tag, nsg=2):
     D = np.array([Fz[i] - Fz[j] for i, j in pairs])
     val, vec = np.linalg.eigh(D @ D.T)
     axis = D.T @ vec[:, -1]; axis /= (np.linalg.norm(axis) + 1e-9)
+    # homoeolog pairs must be K-colourable; if not, keep mutual top-(K-1) pairs only
     mode = os.environ.get("POLYSPLIT_MUTUAL_PAIRS", "auto")
     colourable = k_colourable(pairs, nsg)
     mutual = mode == "1" or (mode == "auto" and not colourable)
@@ -158,8 +161,8 @@ def label_eval(blocks, cc, lengths, top, truth, tag, nsg=2):
         o.write("mutual\n" if mutual else "all\n")
     print(f"  pairs: {len(pairs)} block pairs, {nsg}-colourable={colourable} -> using {len(cpairs)} ({'mutual top-(K-1)' if mutual else 'all'})")
     if nsg == 2:
-        lab = enforce_pairs(Fz @ axis, cpairs, nb)
-    else:
+        lab = enforce_pairs(Fz @ axis, cpairs, nb)            # validated 2-way constrained labelling
+    else:                                                    # K>2: split the largest cluster in two until K clusters
         from sklearn.cluster import KMeans
         axes = D.T @ vec[:, -(nsg - 1):]
         axes /= (np.linalg.norm(axes, axis=0, keepdims=True) + 1e-9)
@@ -167,13 +170,15 @@ def label_eval(blocks, cc, lengths, top, truth, tag, nsg=2):
         lab = np.zeros(nb, dtype=int)
         while len(set(lab.tolist())) < nsg:
             sizes = {c: int(np.sum(lab == c)) for c in set(lab.tolist())}
-            tgt = max(sizes, key=sizes.get)
+            tgt = max(sizes, key=sizes.get)                  # split the largest current cluster
             idx = np.where(lab == tgt)[0]
             if len(idx) < 2:
                 break
             sub = KMeans(n_clusters=2, n_init=10, random_state=1).fit_predict(emb[idx])
             lab[idx[sub == 1]] = max(lab.tolist()) + 1
+    # inference labels S1..SK (cluster id -> name; no truth used)
     cl = {c: f"S{int(lab[blk_of[c]]) + 1}" for c in blk_of}
+    # ---- eval ONLY: best one-to-one cluster -> truth-subgenome mapping ----
     from itertools import permutations
     bw = np.array([sum(lengths[c] for c in com) for com in blocks], float)
     yb = []
@@ -204,7 +209,7 @@ def main():
         next(f)
         for line in f:
             c, L, a, cc_, mf, kls = line.rstrip("\n").split("\t")
-            if kls.startswith("pure_"): truth[c] = kls.split("_", 1)[1]
+            if kls.startswith("pure_"): truth[c] = kls.split("_", 1)[1]   # any K
     top = []; hedges = {}
     with open("homoeolog_edges.tsv") as f:
         next(f)

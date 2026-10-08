@@ -7,6 +7,7 @@ CLUSTER_DIR = sys.argv[1] if len(sys.argv) > 1 else \
 TRUTH = "$DATA/Napus_nam_denovo/sa_read_correct/purity_compare/wg_purity.per_contig.tsv"
 AGP = "$DATA/Napus_nam_denovo/sa_read_correct/hic_ac_cluster/yahs/napus_scaffolds_final.agp"
 
+# ---- truth: contig -> 'A'/'C' (pure only); total assembly bp ----
 truth = {}
 total_assembly_bp = 0
 with open(TRUTH) as f:
@@ -17,6 +18,7 @@ with open(TRUTH) as f:
         if kls == "pure_A": truth[c] = "A"
         elif kls == "pure_C": truth[c] = "C"
 
+# ---- AGP: scaffold -> sorted [(scaf_start, scaf_end, contig)] for W (contig) rows ----
 scaf_iv = defaultdict(list)
 with open(AGP) as f:
     for ln in f:
@@ -30,11 +32,12 @@ scaf_starts = {s: [iv[0] for iv in ivs] for s, ivs in scaf_iv.items()}
 
 def chunk_to_contig(chunk):
     scaf, start, end = chunk.rsplit("_", 2)
-    cs, ce = int(start), int(end)
+    cs, ce = int(start), int(end)          # 0-based-ish; 1bp offset vs AGP is negligible
     bp = ce - cs
     ivs = scaf_iv.get(scaf)
     if not ivs:
         return None, bp
+    # scan intervals overlapping [cs, ce]; start a little left of cs
     i = max(0, bisect.bisect_right(scaf_starts[scaf], cs) - 2)
     ov = defaultdict(int)
     for j in range(i, len(ivs)):

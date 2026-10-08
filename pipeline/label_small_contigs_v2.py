@@ -36,6 +36,7 @@ def repeat_counts(seq):
     return dict(zip(u[keep].tolist(), c[keep].tolist()))
 
 
+# ---------- inputs ----------
 with open(CONTACTS, "rb") as f:
     contacts, lengths = pickle.load(f)
 lab = {}
@@ -45,7 +46,7 @@ with open(LABELS_IN) as f:
     for ln in f:
         p = ln.rstrip("\n").split("\t"); lab[p[0]] = p[1]
 truth = {}
-if os.path.exists(TRUTH):
+if os.path.exists(TRUTH):                                  # truth is eval-only; tolerate absence
     with open(TRUTH) as f:
         next(f)
         for ln in f:
@@ -54,6 +55,7 @@ if os.path.exists(TRUTH):
 
 labels_present = sorted(set(lab.values()))
 
+# ---------- (1) Hi-C linkage (argmax over K subgenomes) ----------
 score = defaultdict(lambda: defaultdict(float))
 for (a, b), w in contacts.items():
     la, lb = lengths.get(a, 0), lengths.get(b, 0)
@@ -77,6 +79,7 @@ for c, s in score.items():
         diffuse.append(c)
 print(f"[hic] called {len(new):,}  diffuse->composition {len(diffuse):,}", file=sys.stderr)
 
+# ---------- (2) composition fallback: nearest of K per-subgenome centroids ----------
 big = {sg: sorted([c for c in lab if lab[c] == sg], key=lambda c: -lengths.get(c, 0))[:SAMPLE_PER_SG]
        for sg in labels_present}
 sampled = set().union(*big.values()) if big else set()

@@ -20,6 +20,7 @@ def contig_labels(path):
 
 
 def matched(a, b, weight=None):
+    """best one-to-one agreement between two labelings (weighted by contig length if given)"""
     common = [c for c in a if c in b]
     la, lb = sorted(set(a.values())), sorted(set(b.values()))
     best = 0.0

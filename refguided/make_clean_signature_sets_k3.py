@@ -29,6 +29,7 @@ def read_fasta_kmers(path):
 
 
 sets = [read_fasta_kmers(sys.argv[1]), read_fasta_kmers(sys.argv[2]), read_fasta_kmers(sys.argv[3])]
+# count how many subgenome sets each canonical k-mer appears in; keep only count==1
 seen = Counter()
 for S in sets:
     for kmer in S:
