@@ -416,7 +416,7 @@ On the *Camelina* assemblies PolySplit-Allo gives the same accuracy with either 
 
 On *B. napus* the hifiasm contigs approach chromosome length. Paralogous chromosomes from the ancient *Brassica*
 triplication then share more 33-mers than τ_H (for example N14 with N11 and N17, all in the C subgenome), so some
-block pairs join blocks of the same subgenome. The pair graph is then not two-colourable (2 and 21 triangles in
+block pairs join blocks of the same subgenome. The pair graph is then not two-colourable, that is, not bipartite (2 and 21 triangles in
 the two assemblies), and PolySplit-Allo keeps only mutual-best pairs (Methods). In all Flye and *Camelina* rows
 the pair graph is K-colourable and all pairs are kept. PolySplit-Allo is above scaffold-first with true groups on
 the HiFi assembly (90.2% against 89.0%) and slightly below it on the HiFi + ONT assembly (93.6% against 94.7%).
@@ -442,7 +442,7 @@ reference from the same sample were run with the same settings, truth rule and s
 Cells give read accuracy (%) unless stated. In coffee,
 whose assembly is fragmented, all pairs are consistent and PolySplit-Allo is well above scaffold-first. In proso
 millet the Flye contigs are close to chromosome length, and B-subgenome chromosomes share enough 33-mers with each
-other to exceed τ_H (58 and 63 triangles in the pair graph); the colourability check removes these pairs. On the millet HiFi
+other to exceed τ_H (58 and 63 triangles in the pair graph). The pair graph is then not two-colourable, and only mutual-best pairs are kept. On the millet HiFi
 assembly scaffold-first reaches 96.5% when it is given the true homoeologous groups and 66.7% when the groups are
 inferred without a reference.
 
