@@ -209,6 +209,9 @@ reported in the Table II "Time" column.
 | *C. microcarpa* (4×) | ONT | 3m 22s | 1m 57s | 9s | **5m 28s** |
 | *C. microcarpa* T1 (6×) | HiFi | 5m 53s | 3m 38s | 13s | **9m 44s** |
 | *C. microcarpa* T1 (6×) | ONT | 5m 41s | 5m 02s | 12s | **10m 55s** |
+| *C. arabica* (4×) | HiFi | 14m 14s | 6m 56s | 58s | **22m 08s** |
+| *P. miliaceum* (4×) | HiFi | 7m 20s | 4m 54s | 22s | **12m 36s** |
+| *P. miliaceum* (4×) | ONT | 17m 06s | 4m 56s | 2s | **22m 04s** |
 
 ### Table S7. Contig misplacement, per dataset and read chemistry
 Diagnostic of the residual impurity: how many assembled contigs are placed in the wrong subgenome. A contig is *misplaced* when the subgenome PolySplit assigns it differs from its true-majority subgenome (the subgenome most of its length aligns to under best-identity alignment to the chromosome-anchored reference); contigs with no anchored alignment are excluded. *Placement bp accuracy* is the fraction of anchored contig length in correctly-placed contigs. The misplaced sequence sits mostly in a few large (>100 kb) contigs; in the higher-impurity datasets these carry the bulk of it (96% of misplaced bp on *B. napus* HiFi, 95–98% on *C. microcarpa* 6×), so the errors are concentrated rather than diffuse. They originate at the repeat-composition block-labelling step (Methods §II-C; Fig. S2C), not from intra-contig chimeras. *C. microcarpa* 4× is essentially clean; the hexaploid (near-identical S1/S2) is the hardest case. Complements the per-subgenome assembly purity in Table S3.
@@ -221,6 +224,9 @@ Diagnostic of the residual impurity: how many assembled contigs are placed in th
 | *C. microcarpa* (4×) | HiFi | 128 | 9 | 0.28 | 99.92 | 1 (0.23 Mb) |
 | *C. microcarpa* T1 (6×) | ONT | 449 | 44 | 20.07 | 96.59 | 12 (19.64 Mb) |
 | *C. microcarpa* T1 (6×) | HiFi | 841 | 54 | 13.08 | 97.76 | 12 (12.37 Mb) |
+| *C. arabica* (4×) | HiFi | 1,385 | 24 | 18.79 | 98.31 | 9 (18.46 Mb) |
+| *P. miliaceum* (4×) | HiFi | 153 | 5 | 33.81 | 95.95 | 5 (33.81 Mb) |
+| *P. miliaceum* (4×) | ONT | 113 | 13 | 16.56 | 97.97 | 7 (16.50 Mb) |
 
 
 ### Table S8. Read accounting, truth labels and accuracy by mapping quality
@@ -255,9 +261,9 @@ Every input read falls into exactly one class. *Truth-labelled* reads align to t
 | *C. microcarpa* T1 (6×) | ONT | S1 17,004; S2 18,843; S3 9,284 | PolySplit-Ref | 90.8 | 93.7 | 49.1 | 93.7 |
 | *C. microcarpa* T1 (6×) | HiFi | S1 3,684; S2 2,432; S3 4,675 | PolySplit-Allo | 96.2 | 97.4 | 66.9 | 97.4 |
 | *C. microcarpa* T1 (6×) | HiFi | S1 3,684; S2 2,432; S3 4,675 | PolySplit-Ref | 96.9 | 98.6 | 58.7 | 98.7 |
-| *C. arabica* (4×) | HiFi | S1 (C) 104,201; S2 (E) 222,097 | PolySplit-Allo | 97.2 | 97.3 | 96.7 | 97.2 |
+| *C. arabica* (4×) | HiFi | S1 (C) 104,201; S2 (E) 222,097 | PolySplit-Allo | 96.9 | 96.8 | 97.9 | 96.8 |
 | *C. arabica* (4×) | HiFi | S1 (C) 104,201; S2 (E) 222,097 | PolySplit-Ref | 96.5 | 97.2 | 79.2 | 97.2 |
-| *P. miliaceum* (4×) | HiFi | S1 (A) 16,370; S2 (B) 46,656 | PolySplit-Allo | 92.0 | 92.6 | 49.4 | 92.6 |
+| *P. miliaceum* (4×) | HiFi | S1 (A) 16,370; S2 (B) 46,656 | PolySplit-Allo | 93.5 | 94.2 | 49.4 | 94.2 |
 | *P. miliaceum* (4×) | HiFi | S1 (A) 16,370; S2 (B) 46,656 | PolySplit-Ref | 95.6 | 96.6 | 31.1 | 96.5 |
 | *P. miliaceum* (4×) | ONT | S1 (A) 2,094; S2 (B) 3,398 | PolySplit-Allo | 95.3 | 95.7 | 71.6 | 95.6 |
 | *P. miliaceum* (4×) | ONT | S1 (A) 2,094; S2 (B) 3,398 | PolySplit-Ref | 95.4 | 96.0 | 53.7 | 96.1 |
@@ -324,19 +330,19 @@ Each anchored chromosome was cut into 10-kb windows and each window aligned to t
 | *C. microcarpa* T1 (6×) | HiFi | 97-99% | 2.3 | 2.1 | 93.8 | 89.7 | 28.8 | 35.6 |
 | *C. microcarpa* T1 (6×) | HiFi | ≥99% | 1.0 | 54.5 | 43.7 | 41.9 | 19.1 | 38.5 |
 | *C. microcarpa* T1 (6×) | HiFi | primary on unplaced scaffold | 2.6 | 0.03 | 64.5 | 52.8 | 26.4 | 31.6 |
-| *C. arabica* (4×) | HiFi | no homoeolog detected | 5.0 | 5.7 | 90.7 | 96.1 | – | 50.8 |
-| *C. arabica* (4×) | HiFi | <92% | 20.0 | 41.0 | 99.1 | 93.8 | – | 62.6 |
-| *C. arabica* (4×) | HiFi | 92-95% | 26.9 | 35.3 | 99.0 | 97.8 | – | 63.3 |
-| *C. arabica* (4×) | HiFi | 95-97% | 27.9 | 9.6 | 98.1 | 98.1 | – | 66.5 |
-| *C. arabica* (4×) | HiFi | 97-99% | 18.7 | 6.5 | 95.3 | 97.0 | – | 66.4 |
-| *C. arabica* (4×) | HiFi | ≥99% | 0.90 | 2.0 | 55.6 | 74.5 | – | 51.0 |
-| *C. arabica* (4×) | HiFi | primary on unplaced scaffold | 0.60 | 0.00 | 89.7 | 76.1 | – | 54.2 |
-| *P. miliaceum* (4×) | HiFi | no homoeolog detected | 33.2 | 13.2 | 93.5 | 97.9 | – | 68.3 |
-| *P. miliaceum* (4×) | HiFi | <92% | 14.6 | 3.7 | 94.1 | 99.9 | – | 63.4 |
-| *P. miliaceum* (4×) | HiFi | 92-95% | 29.7 | 7.6 | 94.0 | 99.7 | – | 68.4 |
-| *P. miliaceum* (4×) | HiFi | 95-97% | 14.1 | 13.3 | 94.2 | 97.9 | – | 69.1 |
-| *P. miliaceum* (4×) | HiFi | 97-99% | 5.4 | 4.0 | 92.5 | 87.2 | – | 70.8 |
-| *P. miliaceum* (4×) | HiFi | ≥99% | 3.0 | 58.2 | 32.9 | 13.9 | – | 28.3 |
+| *C. arabica* (4×) | HiFi | no homoeolog detected | 5.0 | 5.7 | 90.6 | 96.1 | 57.3 | 39.1 |
+| *C. arabica* (4×) | HiFi | <92% | 20.0 | 41.0 | 99.4 | 93.8 | 71.7 | 46.5 |
+| *C. arabica* (4×) | HiFi | 92-95% | 26.9 | 35.3 | 98.9 | 97.8 | 65.2 | 53.6 |
+| *C. arabica* (4×) | HiFi | 95-97% | 27.9 | 9.6 | 97.3 | 98.1 | 54.2 | 56.6 |
+| *C. arabica* (4×) | HiFi | 97-99% | 18.7 | 6.5 | 94.3 | 97.0 | 53.2 | 55.1 |
+| *C. arabica* (4×) | HiFi | ≥99% | 0.90 | 2.0 | 54.9 | 74.5 | 51.4 | 48.1 |
+| *C. arabica* (4×) | HiFi | primary on unplaced scaffold | 0.60 | 0.00 | 96.1 | 76.1 | 32.1 | 21.7 |
+| *P. miliaceum* (4×) | HiFi | no homoeolog detected | 33.2 | 13.2 | 94.6 | 97.9 | 52.3 | 58.5 |
+| *P. miliaceum* (4×) | HiFi | <92% | 14.6 | 3.7 | 95.2 | 99.9 | 62.1 | 65.3 |
+| *P. miliaceum* (4×) | HiFi | 92-95% | 29.7 | 7.6 | 96.4 | 99.7 | 54.7 | 58.4 |
+| *P. miliaceum* (4×) | HiFi | 95-97% | 14.1 | 13.3 | 96.0 | 97.9 | 54.1 | 57.6 |
+| *P. miliaceum* (4×) | HiFi | 97-99% | 5.4 | 4.0 | 93.0 | 87.2 | 48.0 | 57.0 |
+| *P. miliaceum* (4×) | HiFi | ≥99% | 3.0 | 58.2 | 32.9 | 13.9 | 73.3 | 74.1 |
 | *P. miliaceum* (4×) | ONT | no homoeolog detected | 31.7 | 39.2 | 95.0 | 98.0 | – | – |
 | *P. miliaceum* (4×) | ONT | <92% | 14.9 | 13.0 | 95.4 | 98.1 | – | – |
 | *P. miliaceum* (4×) | ONT | 92-95% | 31.2 | 4.7 | 97.0 | 98.3 | – | – |
@@ -437,8 +443,8 @@ as the *B. napus* and *Camelina* datasets (Flye pre-assembly).
 
 | Genome | reads | contigs, size, N50 | all pairs consistent | PolySplit-Allo contig acc. | PolySplit-Allo read acc. | PolySplit-Ref | SubPhaser, automatic groups | SubPhaser, true groups |
 |---|---|---|---|---|---|---|---|---|
-| *C. arabica* (4×) | HiFi | 1,504, 1,115 Mb, 2.5 Mb | yes | 98.7 | 97.2 | 96.5 | 63.8 | 84.4 |
-| *P. miliaceum* (4×) | HiFi | 156, 836 Mb, 12.8 Mb | no | 94.3 | 92.0 | 95.6 | 66.7 | 96.5 |
+| *C. arabica* (4×) | HiFi | 1,504, 1,115 Mb, 2.5 Mb | yes | 98.3 | 96.9 | 96.5 | 52.3 | 72.5 |
+| *P. miliaceum* (4×) | HiFi | 156, 836 Mb, 12.8 Mb | no | 96.0 | 93.5 | 95.6 | 59.7 | 96.3 |
 | *P. miliaceum* (4×) | ONT | 113, 820 Mb, 21.1 Mb | no | 98.0 | 95.3 | 95.4 | n/a | n/a |
 
 Cells give read accuracy (%) unless stated. The column "all pairs consistent" gives the outcome of the
@@ -446,8 +452,8 @@ pair-consistency check (Methods). In coffee, whose assembly is fragmented, the c
 pairs are kept, and PolySplit-Allo is well above SubPhaser. In proso millet the Flye contigs are close to
 chromosome length, and B-subgenome chromosomes share enough 33-mers with each other to exceed τ_H. The check
 finds 58 and 63 sets of three blocks that are all paired with each other, so only the pairs in which each block
-is the strongest partner of the other are kept. On the millet HiFi assembly, SubPhaser reaches 66.7% when the
-homoeologous groups are inferred without a reference, and 96.5% only when it is given the true groups from the
+is the strongest partner of the other are kept. On the millet HiFi assembly, SubPhaser reaches 59.7% when the
+homoeologous groups are inferred without a reference, and 96.3% only when it is given the true groups from the
 reference.
 
 ## Data and Code Availability
