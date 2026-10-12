@@ -99,6 +99,12 @@ but are never false positives.
 | *C. microcarpa* T1 (6×) | HiFi | S1 | 96.7 | 96.1 | 96.4 |
 | *C. microcarpa* T1 (6×) | HiFi | S2 | 94.0 | 98.1 | 96.0 |
 | *C. microcarpa* T1 (6×) | HiFi | S3 | 99.0 | 94.8 | 96.9 |
+| *C. arabica* (4×) | HiFi | S1 (C) | 96.3 | 98.5 | 97.3 |
+| *C. arabica* (4×) | HiFi | S2 (E) | 99.4 | 95.3 | 97.3 |
+| *P. miliaceum* (4×) | ONT | S1 (A) | 95.0 | 96.9 | 95.9 |
+| *P. miliaceum* (4×) | ONT | S2 (B) | 98.5 | 94.1 | 96.3 |
+| *P. miliaceum* (4×) | HiFi | S1 (A) | 88.5 | 98.1 | 93.1 |
+| *P. miliaceum* (4×) | HiFi | S2 (B) | 98.6 | 89.9 | 94.1 |
 
 ### Table S3. Subgenome-resolved assembly quality (HiFi)
 Each subgenome's reads were assembled independently (Flye) and scaffolded with Hi-C (YaHS).
@@ -398,6 +404,8 @@ YaHS scaffolds of the same Flye assembly used by PolySplit-Allo. *Mixed* = scaff
 | *B. napus* NAM0 (4×) | 17 | 2 (156.6) | 3 / 9 | 56.2 | 73.8 | 98.7 |
 | *C. microcarpa* (4×) | 13 | 0 (0.0) | 2 / 6 | 64.5 | 92.9 | 99.0 |
 | *C. microcarpa* T1 (6×) | 20 | 0 (0.0) | 0 / 6 | 38.8 | 89.1 | 96.2 |
+| *C. arabica* (4×) | 20 | 2 (219.9) | 3 / 10 | 52.3 | 72.5 | 96.9 |
+| *P. miliaceum* (4×) | 18 | 0 (0.0) | 3 / 9 | 59.7 | 96.3 | 93.5 |
 
 ### Table S13. PolySplit-Allo and scaffold-first on hifiasm instead of Flye assemblies (HiFi)
 
