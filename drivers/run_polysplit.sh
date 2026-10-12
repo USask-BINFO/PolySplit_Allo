@@ -31,7 +31,7 @@ if [ -n "$FP" ]; then case "$FP" in --*) FLYE_PRESET=$FP;; *) FLYE_PRESET="--$FP
 THREADS=${THREADS:-48}; K_PAIR=33; BETA=0.60
 PY=python3; PIPE=$POLYSPLIT/pipeline
 FLYE_BIN=${FLYE_BIN:-/path/to/flye/bin}
-BWA=bwa; SAMTOOLS=samtools; MINIMAP2=minimap2; GSUFSORT=gsufsort; SEQKIT=seqkit
+BWA=bwa; SAMTOOLS=samtools; MINIMAP2=minimap2; GSUFSORT=gsufsort; GSUFSORT64=gsufsort-64; SEQKIT=seqkit
 mkdir -p "$WORK"; ASM=$WORK/flye_out/assembly.fasta
 if [ "$ASSEMBLER" = hifiasm ]; then
   [ "$TYPE" = hifi ] || { echo "--assembler hifiasm needs --type hifi"; exit 1; }
@@ -84,8 +84,10 @@ fi
 # Stage 3: shared-33mer homoeolog edges (gsufsort GSA + LCP)
 if [ ! -s "$WORK/homoeolog_edges.tsv" ]; then
   log "Stage 3: gsufsort GSA+LCP -> homoeolog edges"
-  "$GSUFSORT" "$ASM" --fasta --gsa 4 8 --output "$WORK/contigs_k33"
-  "$GSUFSORT" "$ASM" --fasta --lcp 1  --output "$WORK/contigs_k33"
+  GS=$GSUFSORT   # the 32-bit build stops near 1 Gb
+  [ "$(awk '{s+=$2} END{print (s>1000000000)}' "$ASM.fai")" = 1 ] && GS=$GSUFSORT64
+  "$GS" "$ASM" --fasta --gsa 4 8 --output "$WORK/contigs_k33"
+  "$GS" "$ASM" --fasta --lcp 1  --output "$WORK/contigs_k33"
   "$PY" "$PIPE/homoeolog_graph_from_lcp.py" --gsa "$WORK/contigs_k33.4.8.gsa" \
         --lcp "$WORK/contigs_k33.1.lcp" --fa "$ASM" --k "$K_PAIR" \
         --min-copy 2 --max-copy 6 --out "$WORK/homoeolog_edges.tsv"

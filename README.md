@@ -3,6 +3,10 @@
 Reference-free subgenome separation of allopolyploid long reads by assembly-first
 homoeolog phasing. This repository accompanies the paper accepted at IEEE BIBM 2026.
 
+The paper evaluates the method on five allopolyploid genomes of four species: *Brassica napus* NAM0 (4x),
+*Camelina microcarpa* (4x and 6x), *Coffea arabica* 'Kona Typica' (4x) and proso millet, *Panicum miliaceum*
+AJ8 (4x).
+
 <p align="center"><img src="figures/Denovo_assembly_polysplit_V2.png" alt="Full PolySplit pipeline schematic" width="100%"></p>
 
 ## Layout
@@ -79,7 +83,8 @@ command, where `map.tsv` is two columns, chromosome and its subgenome (`chrom<TA
 `run_polysplit.sh` then also reports read-level accuracy, precision, recall, and F1.
 
 **Reproducing the paper.** The per-dataset `drivers/run_polysplit_<name>.sh` scripts run the
-exact commands (paths and presets) used for each dataset in the manuscript. The tetraploid and
+exact commands (paths and presets) used for each dataset in the manuscript (`nam0`, `tetraploid`, `hexaploid`,
+`coffee_hifi`, `millet_hifi`, `millet_ont`). The tetraploid and
 NAM0 ONT runs used `--nano-raw`, reproducible with `run_polysplit.sh ... --flye-preset nano-raw`.
 
 **Supplementary tables S7-S12.** Copy `tables/datasets.template.tsv`, fill in the paths, and run (all outputs go to
@@ -101,5 +106,11 @@ score its read labels with `read_accounting.py --label <ref_id>_hifi "SubPhaser 
 Every stage is idempotent: re-running skips any stage whose output already exists.
 
 ## Data
-Sequencing inputs and the evaluation reference are not redistributed here; see the
-manuscript's data-availability statement for accessions.
+Sequencing inputs and the evaluation references are not redistributed here.
+
+| Genome | Reads | Reference |
+|---|---|---|
+| *B. napus* NAM0 (4x) | see the manuscript's data-availability statement | NAM0 reference of the SKBnNAM panel |
+| *C. microcarpa* (4x, 6x) | EBI-ENA PRJEB96055 | EBI-ENA PRJEB96055 |
+| *C. arabica* 'Kona Typica' (4x) | NCBI PRJNA1215012: SRR32133635 (HiFi), SRR32133636 (Omni-C) | GCA_049114775.1 |
+| *P. miliaceum* AJ8 (4x) | NCBI PRJNA1059665: SRR27463934 (HiFi), SRR27463913 (ONT), SRR27463924 (Hi-C) | GCA_038442765.1 |
