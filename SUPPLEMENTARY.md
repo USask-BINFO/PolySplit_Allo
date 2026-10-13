@@ -45,7 +45,7 @@ subgenome is then assembled and Hi-C-scaffolded independently, so homoeologs are
 ### Figure S3. Exact k-mer survival on raw reads, per dataset
 <p align="center"><img src="figures/FigS2_kmer_survival.png" alt="Per-dataset exact k-mer survival vs k for ONT and HiFi" width="100%"></p>
 
-Fraction of a read's $k$-mers that are error-free (per-base identity raised to the $k$-th power) versus $k$, for each dataset's ONT and HiFi reads. Per-base identity is the mean of 1 − `de` (minimap2 gap-compressed divergence) over the primary alignments of each read set to its reference. At $k=33$, the homoeolog-pairing length, exact $k$-mers survive on HiFi (88–94%) but largely collapse on ONT (1.8–7.4%, lowest on the ~88.5%-accurate *B. napus* reads). This is why PolySplit assembles the reads before any exact-$k$-mer analysis: assembly restores the exact $k$-mer structure that raw ONT reads lack.
+Fraction of a read's $k$-mers that are error-free (per-base identity raised to the $k$-th power) versus $k$, for each dataset's ONT and HiFi reads. Per-base identity is the mean of 1 − `de` (minimap2 gap-compressed divergence) over the primary alignments of each read set to its reference. At $k=33$, the homoeolog-pairing length, exact $k$-mers survive on HiFi (86–94%) but largely collapse on ONT (1.8–7.4% in *B. napus* and *Camelina*, lowest on the ~88.5%-accurate *B. napus* reads). The proso millet ONT reads are an ultra-long set with 97.7% identity, and 46% of their 33-mers are error-free. *C. arabica* has HiFi reads only. This is why PolySplit assembles the reads before any exact-$k$-mer analysis: assembly restores the exact $k$-mer structure that raw ONT reads lack.
 
 ### Figure S4. Homoeolog shared-33-mer edge-weight distributions, per dataset and chemistry
 <p align="center"><img src="figures/FigS3_edge_weights.png" alt="Per-dataset shared-33-mer edge-weight distributions, split by reference class" width="100%"></p>
@@ -53,21 +53,21 @@ Fraction of a read's $k$-mers that are error-free (per-base identity raised to t
 Distribution of the number of shared 33-mers between contig pairs, $w_{\mathrm{kmer}}(a,b)$ (exact matches on the assembled strands, counting only 33-mers that occur 2 to 6 times in the assembly), for each dataset (rows) and read type (columns). Each bar is split by what the reference says the contig pairs are (evaluation only): syntenic homoeologs of different subgenomes, homoeologous chromosomes outside the mapped windows, other cross-subgenome pairs, contigs of the same subgenome (paralogs, shared repeats, duplicated haplotigs) and pairs with an unanchored contig; pairs below 100 shared 33-mers are not classified. Below $\tau_H=10^5$ (dashed line) many links join contigs of the same subgenome; above it nearly all are homoeologs, and the few same-subgenome edges above $\tau_H$ (tetraploid HiFi) are removed by the strongest-partner rule (Table S10). $\tau_H$ was read off these distributions, not tuned on truth labels.
 
 ### Figure S5. Read-level confusion matrices across methods and species
-<p align="center"><img src="figures/FigS4_confusion_all.png" alt="Read-level confusion matrices, three species by four methods" width="100%"></p>
+<p align="center"><img src="figures/FigS4_confusion_all.png" alt="Read-level confusion matrices, five genomes by four methods" width="100%"></p>
 
-Rows are the three allopolyploids; columns are the four methods, all shown at HiFi. Within each panel, rows are the true subgenome and columns the predicted outcome: a subgenome, *amb.* (ambiguous: evidence present but the decision rule not met) or *unas.* (unassigned: no usable evidence; see Abbreviations). Each cell gives the number of reads and its colour the row fraction; the panel header gives the read accuracy. Only reads with a truth label are shown (Table S8). All methods output anonymous groups, matched to S1…SK by the best one-to-one assignment to the truth. The panels are drawn from the same counts as Table II and Table S8. **PolySplit-Allo** concentrates on the diagonal (98.7% *B. napus*, 99.0% tetraploid, 96.2% hexaploid, using no reference), whereas **polyCRACKER** collapses the subgenomes into one cluster (83.0%, 50.1%, 41.0%) and **SubPhaser** (scaffold-first) leaks or scrambles them (56.2%, 64.5%, 38.8%; Table S12 explains why). Figure S6 shows PolySplit-Allo and PolySplit-Ref on both read types.
+Rows are the five allopolyploid genomes; columns are the four methods, all shown at HiFi. Within each panel, rows are the true subgenome and columns the predicted outcome: a subgenome, *amb.* (ambiguous: evidence present but the decision rule not met) or *unas.* (unassigned: no usable evidence; see Abbreviations). Each cell gives the number of reads and its colour the row fraction; the panel header gives the read accuracy. Only reads with a truth label are shown (Table S8). All methods output anonymous groups, matched to S1…SK by the best one-to-one assignment to the truth. The panels are drawn from the same counts as Table II and Table S8. **PolySplit-Allo** concentrates on the diagonal (98.7% *B. napus*, 99.0% tetraploid, 96.2% hexaploid, using no reference), whereas **polyCRACKER** collapses the subgenomes into one cluster (83.0%, 50.1%, 41.0%) and **SubPhaser** (scaffold-first) leaks or scrambles them (56.2%, 64.5%, 38.8%; Table S12 explains why). Figure S6 shows PolySplit-Allo and PolySplit-Ref on both read types.
 
 ### Figure S6. PolySplit vs. the reference-guided baseline, across both chemistries
-<p align="center"><img src="figures/FigS5_confusion_chem.png" alt="Confusion matrices: PolySplit vs reference-guided, ONT and HiFi, three genomes" width="70%"></p>
+<p align="center"><img src="figures/FigS5_confusion_chem.png" alt="Confusion matrices: PolySplit vs reference-guided, ONT and HiFi, five genomes" width="70%"></p>
 
-The two exact-$k$-mer methods on all three allopolyploids, one row per read type (HiFi, ONT) per genome, drawn as in Figure S5 (columns: subgenomes, ambiguous, unassigned). PolySplit-Allo (reference-free) matches or exceeds the reference-guided signature scan in five of six genome and read-type combinations, and the gap is largest on error-prone ONT reads (e.g. *B. napus* 95.6% vs 81.7%): the read-level scan leaves many ONT reads ambiguous, whereas assembling first places them on a labelled contig.
+The two exact-$k$-mer methods on all five genomes, one row per read type (HiFi, ONT) per genome (*C. arabica* has HiFi only), drawn as in Figure S5 (columns: subgenomes, ambiguous, unassigned). PolySplit-Allo (reference-free) is more accurate than the reference-guided signature scan in six of nine genome and read-type combinations, and the gap is largest on error-prone ONT reads (e.g. *B. napus* 95.6% vs 81.7%): the read-level scan leaves many ONT reads ambiguous, whereas assembling first places them on a labelled contig.
 
 ## Supplementary Tables
 
 ### Table S1. Assembly size at each stage (Mb, % of reference)
 Mixed Flye = single assembly of all pooled reads (input to PolySplit and the baselines);
 separated = per-subgenome assembly produced after PolySplit partitions the reads; reference =
-placed-chromosome size.
+placed-chromosome size. Separate per-subgenome assemblies were built for *B. napus* and *C. microcarpa*.
 
 | Genome | reads | mixed Flye | separated (Σ subgenomes) | reference |
 |---|---|---|---|---|
@@ -107,7 +107,7 @@ but are never false positives.
 | *P. miliaceum* (4×) | HiFi | S2 (B) | 98.6 | 89.9 | 94.1 |
 
 ### Table S3. Subgenome-resolved assembly quality (HiFi)
-Each subgenome's reads were assembled independently (Flye) and scaffolded with Hi-C (YaHS).
+Each subgenome's reads were assembled independently (Flye) and scaffolded with Hi-C (YaHS), for *B. napus* and *C. microcarpa*.
 Purity (the fraction of assembly length whose best alignment is to the intended subgenome rather
 than its homoeolog) is the separation metric: near-100% purity confirms homoeologs were not fused.
 BUSCO completeness (C = single + duplicated; computed with compleasm v0.2.8 and the brassicales_odb12 lineage, 4,311 genes) is high throughout; the elevated duplication (D) in the
@@ -125,10 +125,10 @@ BUSCO completeness (C = single + duplicated; computed with compleasm v0.2.8 and 
 | *C. microcarpa* 6× SG3 (exp. 227) | 220 (96.9) | 237 | 29.1 Mb | 91.9 (1.5) | ~100 | 99.7 |
 
 
-### Table S4. Parameter sensitivity (all three species, ONT and HiFi)
+### Table S4. Parameter sensitivity (all five genomes, ONT and HiFi)
 Strict read accuracy (correct / chromosome-truth, ambiguous and unassigned counted as errors) under
 wide variation of each decision threshold, holding the others at their default (**bold**), for all
-three allopolyploids on both ONT and HiFi. $t$ and $\rho$ govern the reference-guided signature
+five genomes on ONT and HiFi (*C. arabica* has HiFi only). $t$ and $\rho$ govern the reference-guided signature
 classifier (PolySplit-Ref); $\beta$ and $\alpha$ govern PolySplit read propagation. Accuracy is flat
 across a wide neighbourhood of every default and degrades only at extreme values (e.g. very large
 $\rho$, which rejects most reads as unassigned), so no result hinges on a tuned value. $f_{\max}$
@@ -145,6 +145,9 @@ accuracy thresholds, and are described in Methods rather than swept here.
 | *C. microcarpa* T1 (6×) | ONT | 90.8 | 90.8 | **90.8** | 90.8 | 90.8 | 90.7 | 90.4 | 89.8 |
 | *B. napus* NAM0 | HiFi | 98.4 | 98.4 | **98.4** | 98.4 | 98.4 | 98.4 | 98.4 | 98.3 |
 | *B. napus* NAM0 | ONT | 81.7 | 81.7 | **81.7** | 81.6 | 81.2 | 80.7 | 79.5 | 77.4 |
+| *C. arabica* (4×) | HiFi | 96.5 | 96.5 | **96.5** | 96.5 | 96.5 | 96.5 | 96.4 | 96.4 |
+| *P. miliaceum* (4×) | HiFi | 95.6 | 95.6 | **95.6** | 95.6 | 95.6 | 95.6 | 95.6 | 95.6 |
+| *P. miliaceum* (4×) | ONT | 95.4 | 95.4 | **95.4** | 95.4 | 95.4 | 95.4 | 95.4 | 95.4 |
 
 **Dominance ratio $\rho$** (PolySplit-Ref; $t=3$ fixed)
 
@@ -156,6 +159,9 @@ accuracy thresholds, and are described in Methods rather than swept here.
 | *C. microcarpa* T1 (6×) | ONT | 93.0 | 92.3 | **90.8** | 87.1 | 79.9 | 71.9 | 53.1 | 32.3 |
 | *B. napus* NAM0 | HiFi | 99.5 | 99.1 | **98.4** | 97.0 | 93.9 | 89.0 | 77.6 | 64.6 |
 | *B. napus* NAM0 | ONT | 85.1 | 83.9 | **81.7** | 78.3 | 72.4 | 64.1 | 45.9 | 28.9 |
+| *C. arabica* (4×) | HiFi | 98.2 | 97.6 | **96.5** | 94.5 | 90.1 | 81.1 | 54.7 | 35.9 |
+| *P. miliaceum* (4×) | HiFi | 98.2 | 96.7 | **95.6** | 94.5 | 91.6 | 85.7 | 71.9 | 59.5 |
+| *P. miliaceum* (4×) | ONT | 98.9 | 96.2 | **95.4** | 94.3 | 90.4 | 80.7 | 60.7 | 43.6 |
 
 **Read confidence floor $\beta$** (PolySplit)
 
@@ -167,6 +173,9 @@ accuracy thresholds, and are described in Methods rather than swept here.
 | *C. microcarpa* T1 (6×) | ONT | 93.6 | 93.1 | **92.3** | 89.1 | 81.8 | 72.1 |
 | *B. napus* NAM0 | HiFi | 98.8 | 98.8 | **98.7** | 98.5 | 98.4 | 98.2 |
 | *B. napus* NAM0 | ONT | 96.9 | 96.3 | **95.6** | 93.8 | 92.1 | 87.8 |
+| *C. arabica* (4×) | HiFi | 97.7 | 97.5 | **96.9** | 96.5 | 96.4 | 96.3 |
+| *P. miliaceum* (4×) | HiFi | 93.7 | 93.6 | **93.5** | 93.3 | 93.1 | 92.9 |
+| *P. miliaceum* (4×) | ONT | 96.1 | 95.7 | **95.3** | 92.7 | 91.8 | 90.4 |
 
 **Small-contig recovery floor $\alpha$** (PolySplit)
 
@@ -178,6 +187,9 @@ accuracy thresholds, and are described in Methods rather than swept here.
 | *C. microcarpa* T1 (6×) | ONT | 92.4 | 92.3 | **92.3** | 92.3 | 92.1 | 91.9 |
 | *B. napus* NAM0 | HiFi | 98.7 | 98.7 | **98.7** | 98.7 | 98.7 | 98.3 |
 | *B. napus* NAM0 | ONT | 95.2 | 95.2 | **95.2** | 95.2 | 95.0 | 94.6 |
+| *C. arabica* (4×) | HiFi | 96.9 | 96.9 | **96.9** | 96.9 | 96.8 | 96.4 |
+| *P. miliaceum* (4×) | HiFi | 93.5 | 93.5 | **93.5** | 93.5 | 93.5 | 93.5 |
+| *P. miliaceum* (4×) | ONT | 95.3 | 95.3 | **95.3** | 95.3 | 95.3 | 95.3 |
 
 ### Table S5. Assembly-free read-direct control (no assembly, no reference)
 Test of whether subgenome signal is recoverable from raw reads *without* the assembly step. Raw
@@ -188,13 +200,15 @@ every other method. This is the assembly-free **ablation** of PolySplit, not a v
 PolySplit's Hi-C blocking, homoeolog pairing, and repeat-composition contrast all require assembled
 contigs and cannot run on raw reads. Accuracy near the $1/K$ chance line means the subgenome signal
 is not accessible in raw reads and the assembly step is necessary. Contrast with the assembled
-PolySplit read accuracies in main-text Table II (95–99%).
+PolySplit read accuracies in main-text Table II (92–99%).
 
 | Genome | $K$ | chance % | ONT acc % | HiFi acc % |
 |---|---|---|---|---|
 | *B. napus* NAM0 | 2 | 50.0 | 54.8 | 57.2 |
 | *C. microcarpa* (4×) | 2 | 50.0 | 50.5 | 51.7 |
 | *C. microcarpa* T1 (6×) | 3 | 33.3 | 35.6 | 38.4 |
+| *C. arabica* (4×) | 2 | 50.0 | – | 50.7 |
+| *P. miliaceum* (4×) | 2 | 50.0 | 50.9 | 55.6 |
 
 ### Table S6. Subgenome-separation runtime by stage
 Wall-clock of the reference-free separation stages only, measured on a single node
@@ -370,6 +384,15 @@ Each contig pair is classified with the reference: *syntenic homoeolog* (differe
 | *C. microcarpa* (4×) | HiFi | 687 | 55.1% | 27 | 77.8% | 22.2% | 16 | 100.0% | 345,859 (163,258–3,124,211) |
 | *C. microcarpa* T1 (6×) | ONT | 1,521 | 60.0% | 73 | 100.0% | 0.0% | 35 | 100.0% | 405,774 (164,091–1,315,618) |
 | *C. microcarpa* T1 (6×) | HiFi | 713 | 41.0% | 112 | 100.0% | 0.0% | 89 | 100.0% | 193,949 (105,883–1,052,130) |
+| *C. arabica* (4×) | HiFi | 1,108 | 57.5% | 78 | 100.0% | 0.0% | 61 | 100.0% | 261,790 (101,112–4,392,335) |
+| *P. miliaceum* (4×) | ONT | 1,195 | 53.5% | 179 | 11.8% | 88.2% | 49 | 31.7% | 181,413 (103,454–1,971,465) |
+| *P. miliaceum* (4×) | HiFi | 1,518 | 60.5% | 141 | 22.7% | 77.3% | 70 | 31.4% | 151,880 (101,200–1,204,783) |
+
+In *P. miliaceum* the Flye contigs are close to chromosome length (N50 12.8 Mb on HiFi). Contigs of the B subgenome share
+about 9,600 33-mers per Mb with each other, against about 30,000 per Mb for homoeologous contigs, and over contigs of this
+length that is enough to exceed τ_H. Most retained edges there therefore join contigs of the same subgenome (43 of the 70 on
+HiFi join two B contigs). The pair-consistency check (Methods) detects this at the block level and keeps only the pairs in
+which each block is the strongest partner of the other.
 
 ### Table S11. Hi-C normalisation and sensitivity of the block and pairing thresholds
 
@@ -383,6 +406,9 @@ Each contig pair is classified with the reference: *syntenic homoeolog* (differe
 | *C. microcarpa* (4×) | HiFi | 2,934 (256) | 0.87 / 0.60 | 0.95 / 0.87 | 0.65 / 0.81 | 94.9 / 94.9 |
 | *C. microcarpa* T1 (6×) | ONT | 23,645 (1,523) | 0.79 / 0.61 | 0.90 / 0.78 | 0.59 / 0.67 | 85.6 / 85.6 |
 | *C. microcarpa* T1 (6×) | HiFi | 114,062 (6,129) | 0.80 / 0.54 | 0.93 / 0.82 | 0.78 / 0.88 | 98.8 / 99.2 |
+| *C. arabica* (4×) | HiFi | 317,146 (17,650) | 0.82 / 0.64 | 0.90 / 0.76 | 0.74 / 0.84 | 98.9 / 99.0 |
+| *P. miliaceum* (4×) | ONT | 3,646 (187) | 0.92 / 0.59 | 0.98 / 0.92 | 0.69 / 0.86 | 95.3 / 97.7 |
+| *P. miliaceum* (4×) | HiFi | 6,209 (419) | 0.93 / 0.77 | 0.97 / 0.91 | 0.59 / 0.73 | 97.3 / 98.2 |
 
 **Threshold sensitivity.** PolySplit-Allo re-run from the Hi-C blocks onward on the same assemblies, Hi-C contacts and shared-33-mer edges, changing one setting at a time: a minimum raw contact count per contig pair (default: none) or τ_H (default 10^5). Cells: contig accuracy / read accuracy (%).
 
@@ -394,6 +420,9 @@ Each contig pair is classified with the reference: *syntenic homoeolog* (differe
 | *C. microcarpa* (4×) | HiFi | 100.0 / 99.0 | 100.0 / 99.0 | 100.0 / 99.0 | 100.0 / 99.0 | 99.8 / 98.8 | 100.0 / 99.0 |
 | *C. microcarpa* T1 (6×) | ONT | 97.4 / 92.3 | 97.4 / 92.3 | 97.4 / 92.3 | 97.4 / 92.3 | 97.4 / 92.3 | 98.9 / 94.0 |
 | *C. microcarpa* T1 (6×) | HiFi | 97.9 / 96.2 | 97.9 / 96.2 | 97.9 / 96.2 | 97.9 / 96.2 | 98.0 / 96.4 | 98.2 / 96.5 |
+| *C. arabica* (4×) | HiFi | 98.3 / 96.9 | 97.8 / 96.3 | 97.8 / 96.2 | 97.8 / 96.1 | 93.9 / 92.4 | 98.3 / 96.9 |
+| *P. miliaceum* (4×) | ONT | 98.0 / 95.3 | 98.0 / 95.3 | 98.0 / 95.3 | 98.0 / 95.3 | 98.0 / 95.3 | 94.5 / 92.1 |
+| *P. miliaceum* (4×) | HiFi | 96.0 / 93.5 | 96.0 / 93.5 | 96.0 / 93.5 | 96.0 / 93.5 | 96.3 / 93.8 | 95.7 / 93.2 |
 
 ### Table S12. Why scaffold-first separation failed (HiFi assemblies)
 
