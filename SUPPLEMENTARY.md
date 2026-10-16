@@ -1,14 +1,14 @@
 # PolySplit-Allo - Supplementary Materials
 
 This page hosts the supplementary material linked from the manuscript. Supplementary figure and
-table numbering follows the manuscript order (Figures S1–S6, Tables S1–S13). Figures live in
+table numbering follows the manuscript order (Figures S1–S6, Tables S1–S14). Figures live in
 `figures/`; place the pristine PNGs there (do not pass them through any text processor).
 
 ## Abbreviations and terms
 - **ONT**, Oxford Nanopore Technologies long reads; **HiFi**, PacBio high-fidelity (circular consensus) long reads.
 - **Hi-C**, chromosome conformation capture followed by sequencing: each read pair joins two DNA fragments that were close together in the nucleus. **Omni-C** is a Hi-C variant that cuts chromatin with a sequence-independent nuclease instead of a restriction enzyme; both give the same kind of contact read pairs and are called Hi-C here.
 - **Homoeologs**, the corresponding chromosomes (or genes) that the subgenomes inherited from their different progenitor species; **homologs** are the two copies of one chromosome within a subgenome.
-- **K**, number of subgenomes (a required input; 2 for the tetraploids, 3 for the hexaploid); **k**, k-mer length. Subgenomes are named **S1…SK**: *B. napus* S1 = A (N1–N10), S2 = C (N11–N19); *C. microcarpa* S1–S3 = SG1 (Chr01–06), SG2 (Chr07–13), SG3 (Chr14–20). PolySplit-Allo outputs anonymous groups that are matched to S1…SK only for evaluation.
+- **K**, number of subgenomes (a required input; 2 for the tetraploids, 3 for the hexaploid); **k**, k-mer length. Subgenomes are named **S1…SK**: *B. napus* S1 = A (N1–N10), S2 = C (N11–N19); *C. microcarpa* S1–S3 = SG1 (Chr01–06), SG2 (Chr07–13), SG3 (Chr14–20); *C. arabica* S1 = C (1C–11C), S2 = E (1E–11E); proso millet S1 = A (1A–9A), S2 = B (1B–9B). PolySplit-Allo outputs anonymous groups that are matched to S1…SK only for evaluation.
 - **Hi-C block**, a group of contigs joined by Louvain clustering of the length-normalized Hi-C contact graph; a block usually covers one chromosome or part of one, but it is not assumed to be a chromosome.
 - **Ambiguous** read: evidence for at least one subgenome, but the decision rule is not met (PolySplit-Ref: signature hits but Eq. 2 fails; PolySplit-Allo and baselines: the top subgenome holds less than β of the alignment weight). **Unassigned** read: no usable evidence (PolySplit-Ref: no signature hit, including reads under 2 kb, which are not scanned; PolySplit-Allo and baselines: no alignment to a labelled contig). Both count as errors.
 - **MAPQ**, mapping quality; **LCP**, longest common prefix (array); **GSA**, generalized suffix array; **SVD**, singular value decomposition; **AUC**, area under the receiver operating characteristic (ROC) curve; **N50**, the length such that sequences of this length or longer hold half of all bases; **BUSCO**, Benchmarking Universal Single-Copy Orthologs; **ENA**, European Nucleotide Archive; **PAF**, pairwise mapping format.
@@ -24,7 +24,7 @@ $k$-mers shared by both subgenomes are discarded, leaving disjoint per-subgenome
 (panel 5); each $k$-mer is then canonicalized (merged with its reverse complement) and high-copy
 $k$-mers are removed by the repeat filter (panel 6). Each read is scanned and its canonical $k$-mers
 matched to the sets; a decision rule (minimum hits $t$, dominance ratio $\rho$) labels the read as one
-subgenome or ambiguous (panel 7). This is the reference-guided upper-bound baseline (PolySplit-Ref,
+subgenome or ambiguous (panel 7). The defaults ($t=3$, $\rho=3.0$) are conservative: they favour precision over yield, because a misassigned read contaminates a subgenome whereas an ambiguous read is only dropped (Table S4 shows that accuracy is stable around them). This is the reference-guided upper-bound baseline (PolySplit-Ref,
 Methods §II-B); it is not part of the reference-free PolySplit-Allo workflow.
 
 ### Figure S2. The full PolySplit pipeline
@@ -370,7 +370,7 @@ Each anchored chromosome was cut into 10-kb windows and each window aligned to t
 | *P. miliaceum* (4×) | ONT | 97-99% | 5.0 | 1.5 | 94.3 | 95.6 | – | – |
 | *P. miliaceum* (4×) | ONT | ≥99% | 3.0 | 38.4 | 76.8 | 12.2 | – | – |
 
-The ranges quoted in the manuscript are for the *B. napus* and *Camelina* datasets. In *C. arabica* and *P. miliaceum* the pattern is the same, with two differences. In *P. miliaceum*, 3.0% of reads lie in near-identical regions (≥99%), against 0.6 to 1.1% in *B. napus* and *Camelina*, and about a third of reads lie in windows with no detected homoeolog, against at most 15%; its two subgenomes differ in size (355 and 444 Mb), so more sequence has no aligned counterpart. In *C. arabica* the subgenomes are more similar: 18.7% of reads lie in regions that are 97 to 99% identical.
+The ranges quoted in the manuscript are for the *B. napus* and *Camelina* datasets. In *C. arabica* and *P. miliaceum* the pattern is the same, with two differences. In *P. miliaceum*, 3.0% of reads lie in near-identical regions (≥99%), against 0.6 to 1.1% in *B. napus* and *Camelina*, and about a third of reads lie in windows with no detected homoeolog, against at most 15%; its two subgenomes differ in size (355 and 444 Mb), so more sequence has no aligned counterpart. In *C. arabica* the subgenomes are more similar: 18.7% of reads lie in regions that are 97 to 99% identical. PolySplit-Ref drops in the same near-identical regions. Assembling first helps most for ONT reads outside them, by up to 15 points in *B. napus*.
 
 ### Table S10. Validation of shared-33-mer homoeolog edges against the reference
 
