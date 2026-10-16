@@ -451,7 +451,7 @@ runs. For *Camelina*, hifiasm was also run with the ONT reads added (`--ul`), gi
 | *C. microcarpa* (4×) | Flye | 198, 361 Mb, 10.5 Mb | 100.0 | 99.0 | 64.5 | 92.9 |
 | *C. microcarpa* (4×) | hifiasm | 1,012, 409 Mb, 14.8 Mb | 97.9 | 98.2 | 84.0 | 93.3 |
 | *C. microcarpa* (4×) | hifiasm, HiFi + ONT | 337, 384 Mb, 16.2 Mb | 99.9 | 99.2 | 49.4 | 93.6 |
-| *C. microcarpa* T1 (6×) | Flye | 1,010, 591 Mb, 2.0 Mb | 97.8 | 96.2 | 38.8 | 89.2 |
+| *C. microcarpa* T1 (6×) | Flye | 1,010, 591 Mb, 2.0 Mb | 97.8 | 96.2 | 38.8 | 89.1 |
 | *C. microcarpa* T1 (6×) | hifiasm | 999, 624 Mb, 5.9 Mb | 97.8 | 96.1 | 54.9 | 89.3 |
 | *C. microcarpa* T1 (6×) | hifiasm, HiFi + ONT | 397, 608 Mb, 11.3 Mb | 98.1 | 96.3 | 51.3 | 90.4 |
 
