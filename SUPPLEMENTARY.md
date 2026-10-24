@@ -50,7 +50,7 @@ Fraction of a read's $k$-mers that are error-free (per-base identity raised to t
 ### Figure S4. Homoeolog shared-33-mer edge-weight distributions, per dataset and chemistry
 <p align="center"><img src="figures/FigS3_edge_weights.png" alt="Per-dataset shared-33-mer edge-weight distributions, split by reference class" width="100%"></p>
 
-Distribution of the number of shared 33-mers between contig pairs, $w_{\mathrm{kmer}}(a,b)$ (exact matches on the assembled strands, counting only 33-mers that occur 2 to 6 times in the assembly), for each dataset (rows) and read type (columns). Each bar is split by what the reference says the contig pairs are (evaluation only): syntenic homoeologs of different subgenomes, homoeologous chromosomes outside the mapped windows, other cross-subgenome pairs, contigs of the same subgenome (paralogs, shared repeats, duplicated haplotigs) and pairs with an unanchored contig; pairs below 100 shared 33-mers are not classified. Below $\tau_H=10^5$ (dashed line) many links join contigs of the same subgenome; above it nearly all are homoeologs, and the few same-subgenome edges above $\tau_H$ (tetraploid HiFi) are removed by the strongest-partner rule (Table S10). $\tau_H$ was read off these distributions, not tuned on truth labels.
+Distribution of the number of shared 33-mers between contig pairs, $w_{\mathrm{kmer}}(a,b)$ (exact matches on the assembled strands, counting only 33-mers that occur 2 to 6 times in the assembly), for each dataset (rows) and read type (columns). Each bar is split by what the reference says the contig pairs are (evaluation only): syntenic homoeologs of different subgenomes, homoeologous chromosomes outside the mapped windows, other cross-subgenome pairs, contigs of the same subgenome (paralogs, shared repeats, duplicated haplotigs) and pairs with an unanchored contig; pairs below 100 shared 33-mers are not classified. Below $\tau_H=10^5$ (dashed line) most links join contigs of the same subgenome; above it nearly all join homoeologs, except in proso millet, whose near-chromosome-length contigs let same-subgenome pairs exceed $\tau_H$ (Table S10).
 
 ### Figure S5. Read-level confusion matrices across methods and species
 <p align="center"><img src="figures/FigS4_confusion_all.png" alt="Read-level confusion matrices, five genomes by four methods" width="100%"></p>
@@ -394,6 +394,8 @@ length that is enough to exceed τ_H. Most retained edges there therefore join c
 HiFi join two B contigs). The pair-consistency check (Methods) detects this at the block level and keeps only the pairs in
 which each block is the strongest partner of the other.
 
+In homoeologous contig pairs, one shared 33-mer corresponds to a median of 10.3 bp of aligned sequence (minimap2 asm20 alignments of 224 sampled homoeolog pairs across all datasets; interquartile range 6.0-15.0 bp). τ_H = 10^5 therefore corresponds to 0.5-1.1 Mb of aligned sequence in every dataset except proso millet (3.4-5.4 Mb).
+
 ### Table S11. Hi-C normalisation and sensitivity of the block and pairing thresholds
 
 **Length normalisation.** Contig pairs with both contigs ≥50 kb, pure and anchored. Spearman ρ between the contact measure and √(ℓ_a ℓ_b); AUC = area under the receiver operating characteristic curve for telling same-chromosome from different-chromosome pairs; *top partner* = % of contigs whose strongest Hi-C partner lies on the same chromosome.
@@ -410,19 +412,21 @@ which each block is the strongest partner of the other.
 | *P. miliaceum* (4×) | ONT | 3,646 (187) | 0.92 / 0.59 | 0.98 / 0.92 | 0.69 / 0.86 | 95.3 / 97.7 |
 | *P. miliaceum* (4×) | HiFi | 6,209 (419) | 0.93 / 0.77 | 0.97 / 0.91 | 0.59 / 0.73 | 97.3 / 98.2 |
 
-**Threshold sensitivity.** PolySplit-Allo re-run from the Hi-C blocks onward on the same assemblies, Hi-C contacts and shared-33-mer edges, changing one setting at a time: a minimum raw contact count per contig pair (default: none) or τ_H (default 10^5). Cells: contig accuracy / read accuracy (%).
+**Threshold sensitivity.** PolySplit-Allo re-run from the Hi-C blocks onward on the same assemblies, Hi-C contacts and shared-33-mer edges, changing one setting at a time: a minimum raw contact count per contig pair (default: none) or τ_H (default 10^5, applied to the summed homoeolog evidence between two Hi-C blocks). Cells: contig accuracy / read accuracy (%).
 
 | Genome | reads | default | ≥2 contacts | ≥5 contacts | ≥10 contacts | τ_H = 5×10^4 | τ_H = 2×10^5 |
 |---|---|---|---|---|---|---|---|
-| *B. napus* NAM0 (4×) | ONT | 98.8 / 95.6 | 98.1 / 94.9 | 98.8 / 95.6 | 98.4 / 95.1 | 97.3 / 94.2 | 98.3 / 95.1 |
-| *B. napus* NAM0 (4×) | HiFi | 99.1 / 98.7 | 99.1 / 98.7 | 99.1 / 98.7 | 99.1 / 98.5 | 94.5 / 93.9 | 99.1 / 98.8 |
-| *C. microcarpa* (4×) | ONT | 99.6 / 97.2 | 99.6 / 97.2 | 99.6 / 97.2 | 99.6 / 97.2 | 97.7 / 95.5 | 75.9 / 74.3 |
+| *B. napus* NAM0 (4×) | ONT | 98.8 / 95.6 | 98.1 / 94.9 | 98.8 / 95.6 | 98.4 / 95.1 | 99.2 / 95.8 | 98.3 / 95.1 |
+| *B. napus* NAM0 (4×) | HiFi | 99.1 / 98.7 | 99.1 / 98.7 | 99.1 / 98.7 | 99.1 / 98.5 | 95.7 / 95.0 | 99.1 / 98.8 |
+| *C. microcarpa* (4×) | ONT | 99.6 / 97.2 | 99.6 / 97.2 | 99.6 / 97.2 | 99.6 / 97.2 | 97.7 / 95.5 | 99.6 / 97.2 |
 | *C. microcarpa* (4×) | HiFi | 100.0 / 99.0 | 100.0 / 99.0 | 100.0 / 99.0 | 100.0 / 99.0 | 99.8 / 98.8 | 100.0 / 99.0 |
-| *C. microcarpa* T1 (6×) | ONT | 97.4 / 92.3 | 97.4 / 92.3 | 97.4 / 92.3 | 97.4 / 92.3 | 97.4 / 92.3 | 98.9 / 94.0 |
-| *C. microcarpa* T1 (6×) | HiFi | 97.9 / 96.2 | 97.9 / 96.2 | 97.9 / 96.2 | 97.9 / 96.2 | 98.0 / 96.4 | 98.2 / 96.5 |
+| *C. microcarpa* T1 (6×) | ONT | 97.4 / 92.3 | 97.4 / 92.3 | 97.4 / 92.3 | 97.4 / 92.3 | 97.4 / 92.3 | 97.4 / 92.3 |
+| *C. microcarpa* T1 (6×) | HiFi | 97.9 / 96.2 | 97.9 / 96.2 | 97.9 / 96.2 | 97.9 / 96.2 | 98.0 / 96.4 | 97.9 / 96.2 |
 | *C. arabica* (4×) | HiFi | 98.3 / 96.9 | 97.8 / 96.3 | 97.8 / 96.2 | 97.8 / 96.1 | 93.9 / 92.4 | 98.3 / 96.9 |
 | *P. miliaceum* (4×) | ONT | 98.0 / 95.3 | 98.0 / 95.3 | 98.0 / 95.3 | 98.0 / 95.3 | 98.0 / 95.3 | 94.5 / 92.1 |
-| *P. miliaceum* (4×) | HiFi | 96.0 / 93.5 | 96.0 / 93.5 | 96.0 / 93.5 | 96.0 / 93.5 | 96.3 / 93.8 | 95.7 / 93.2 |
+| *P. miliaceum* (4×) | HiFi | 96.0 / 93.5 | 96.0 / 93.5 | 96.0 / 93.5 | 96.0 / 93.5 | 96.3 / 93.8 | 96.8 / 94.4 |
+
+**Fragmented assembly.** With the proso millet HiFi contigs cut into 1 Mb pieces, contig accuracy was 85.1% at τ_H = 10^5 (95.3% at 5×10^4, 72.1% at 2×10^5). Applying τ_H to each contig pair separately instead of to the summed block-pair evidence gives 61.6%.
 
 ### Table S12. Why scaffold-first separation failed (HiFi assemblies)
 
