@@ -16,6 +16,18 @@ MAX_ITERS = 4
 SWEEP = [(100000, 1), (50000, 2), (30000, 3), (20000, 3), (20000, 5)]   # (edge_min, min_edges)
 
 
+def induced(G, nodes):                                       # subgraph that keeps G's node and edge order
+    keep = set(nodes); H = nx.Graph(); H.add_nodes_from(n for n in G if n in keep)
+    H.add_edges_from((u, v, G[u][v]) for u in H for v in G[u] if v in keep)
+    return H
+
+
+def communities(G, res):                                     # Louvain, returned in G's node order
+    rank = {n: i for i, n in enumerate(G)}
+    return sorted((sorted(c, key=rank.get) for c in louvain_communities(G, weight="weight", resolution=res, seed=1)),
+                  key=lambda c: rank[c[0]])
+
+
 def contig_repeat_counts(seq, k, mc):
     a = np.frombuffer(seq.encode(), np.uint8); code = MAP[a]
     if code.size < k:
@@ -104,9 +116,7 @@ def dechimerize(blocks, G, hedges, lengths, edge_min, min_edges):
         for i, com in enumerate(blocks):
             if i in chim:
                 nsplit += 1
-                sub = G.subgraph(com)
-                subs = [list(c) for c in louvain_communities(sub, weight="weight",
-                                                             resolution=SUBRES, seed=1)]
+                subs = communities(induced(G, com), SUBRES)
                 kept = [s for s in subs if sum(lengths[c] for c in s) >= MIN_SUB]
                 if len(kept) >= 2:
                     new.extend(kept)
@@ -225,8 +235,7 @@ def main():
     for (a, b), w in contacts.items():
         if lengths.get(a, 0) >= MIN_LEN and lengths.get(b, 0) >= MIN_LEN:
             G.add_edge(a, b, weight=w / ((lengths[a] * lengths[b]) ** 0.5))
-    base_blocks = [com for com in (list(c) for c in louvain_communities(G, weight="weight",
-                                   resolution=RES, seed=1)) if sum(lengths[x] for x in com) >= MIN_BLOCK]
+    base_blocks = [com for com in communities(G, RES) if sum(lengths[x] for x in com) >= MIN_BLOCK]
 
     want = {c for com in base_blocks for c in com}
     seqs = {}; cur, cn = [], None

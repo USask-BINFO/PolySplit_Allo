@@ -2,8 +2,7 @@
 import sys, pickle, os
 from collections import defaultdict
 import networkx as nx
-from networkx.algorithms.community import louvain_communities
-from decloud_blocks_v2 import (contig_repeat_counts, label_eval,
+from decloud_blocks_v2 import (contig_repeat_counts, label_eval, induced, communities,
                                MIN_LEN, MIN_BLOCK, MIN_SUB, K, MC_CONTIG,
                                RES, SUBRES, PAIR_MIN, MAX_ITERS)
 
@@ -20,12 +19,11 @@ def structural_dechimerize(blocks, G, strong_edges, lengths, verbose=True):
         changed = False
         new = []
         for com in blocks:
-            sub = G.subgraph(com)
+            sub = induced(G, com)
             if sub.number_of_edges() == 0 or sub.size(weight="weight") == 0:
                 parts = [list(com)]          # edgeless/zero-weight subgraph: cannot re-cluster, keep whole
             else:
-                parts = [list(c) for c in louvain_communities(sub, weight="weight",
-                                                              resolution=SUBRES, seed=1)]
+                parts = communities(sub, SUBRES)
             big = [p for p in parts if sum(lengths[c] for c in p) >= MIN_SUB]
             seam = None
             if len(big) >= 2:
@@ -90,8 +88,7 @@ def main():
     for (a, b), w in contacts.items():
         if lengths.get(a, 0) >= MIN_LEN and lengths.get(b, 0) >= MIN_LEN:
             G.add_edge(a, b, weight=w / ((lengths[a] * lengths[b]) ** 0.5))
-    base_blocks = [com for com in (list(c) for c in louvain_communities(G, weight="weight",
-                                   resolution=RES, seed=1)) if sum(lengths[x] for x in com) >= MIN_BLOCK]
+    base_blocks = [com for com in communities(G, RES) if sum(lengths[x] for x in com) >= MIN_BLOCK]
 
     want = {c for com in base_blocks for c in com}
     seqs = {}; cur, cn = [], None
