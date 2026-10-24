@@ -123,7 +123,7 @@ def dechimerize(blocks, G, hedges, lengths, edge_min, min_edges):
     return blocks, nsplit
 
 
-def label_eval(blocks, cc, lengths, top, truth, tag, nsg=2):
+def label_eval(blocks, cc, lengths, top, truth, tag, nsg=2, pooled=False):
     blk_of = {c: i for i, com in enumerate(blocks) for c in com}
     nb = len(blocks)
     bcnt = [defaultdict(int) for _ in range(nb)]
@@ -146,6 +146,8 @@ def label_eval(blocks, cc, lengths, top, truth, tag, nsg=2):
     for a, b, w in top:
         if a in blk_of and b in blk_of and blk_of[a] != blk_of[b]:
             i, j = blk_of[a], blk_of[b]; bpw[(min(i, j), max(i, j))] += w
+    if pooled:                                               # tau_H on the summed block-pair evidence
+        bpw = defaultdict(float, {p: w for p, w in bpw.items() if w >= PAIR_MIN})
     pairs = list(bpw)
     if len(pairs) < 2:
         return None, 0, 0

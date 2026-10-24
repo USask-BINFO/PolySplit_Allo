@@ -82,8 +82,8 @@ def main():
             raw.append((a, b, w))
             if w > mx.get(a, 0): mx[a] = w
             if w > mx.get(b, 0): mx[b] = w
-    top = [(a, b, w) for (a, b, w) in raw
-           if w >= PAIR_MIN and w >= FRAC * mx[a] and w >= FRAC * mx[b]]
+    sp = [(a, b, w) for (a, b, w) in raw if w >= FRAC * mx[a] and w >= FRAC * mx[b]]
+    top = [(a, b, w) for (a, b, w) in sp if w >= PAIR_MIN]
 
     nodes = [c for c in lengths if lengths[c] >= MIN_LEN]
     G = nx.Graph(); G.add_nodes_from(nodes)
@@ -109,8 +109,8 @@ def main():
     bl, ns = structural_dechimerize([list(b) for b in base_blocks], G, top, lengths)
     print(f"\n{ns} splits  ->  {len(base_blocks)} -> {len(bl)} blocks\n")
     print("config                          blocks  block%  contig(bp)%")
-    label_eval(base_blocks, cc, lengths, top, truth, "baseline (no decloud)", nsg=NSG)
-    cl, _, _ = label_eval(bl, cc, lengths, top, truth, "structural de-chimerize", nsg=NSG)
+    label_eval(base_blocks, cc, lengths, sp, truth, "baseline (no decloud)", nsg=NSG, pooled=True)
+    cl, _, _ = label_eval(bl, cc, lengths, sp, truth, "structural de-chimerize", nsg=NSG, pooled=True)
 
     # write contig A/C labels in the same format decloud_blocks_v2.py emits (drop-in for the pipeline)
     out = "decloud_structural_contig_labels.tsv"
